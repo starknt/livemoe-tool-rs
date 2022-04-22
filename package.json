@@ -1,0 +1,17 @@
+{
+  "name": "win-func-tools",
+  "version": "1.0.4",
+  "description": "",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [],
+  "author": "Seven",
+  "license": "MIT",
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^4.2.0"
+  }
+}
