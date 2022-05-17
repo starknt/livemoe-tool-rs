@@ -23,7 +23,7 @@ Napi::Boolean EnableAero(const Napi::CallbackInfo &info);
 Napi::Value SetTaskbar(const Napi::CallbackInfo &info);
 Napi::Value RestoreTaskbar(const Napi::CallbackInfo &info);
 
-Napi::Value SetSystemCursorToNode(const Napi::CallbackInfo& info);
+Napi::Value SetSystemCursorToNode(const Napi::CallbackInfo &info);
 Napi::Value RestoreSystemCursor(const Napi::CallbackInfo &info);
 
 Napi::Value ShowDesktopIcon(const Napi::CallbackInfo &info);
@@ -33,4 +33,5 @@ Napi::Value ShowShellWindow(const Napi::CallbackInfo &info);
 Napi::Value HideShellWindow(const Napi::CallbackInfo &info);
 
 Napi::Value QueryUserState(const Napi::CallbackInfo &info);
+Napi::Value IsInDesktop(const Napi::CallbackInfo &info);
 #endif
