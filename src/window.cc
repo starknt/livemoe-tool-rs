@@ -138,10 +138,7 @@ BOOL IsDesktop()
 	{
 		FindWorkerWWindow();
 	}
-	POINT point;
-	GetCursorPos(&point);
-	HWND pointWindow = WindowFromPoint(point);
 	HWND current_win_foreg = GetForegroundWindow();
 
-	return current_win_foreg == workerw || pointWindow == FoldView;
+	return current_win_foreg == workerw || current_win_foreg == __workerw;
 }

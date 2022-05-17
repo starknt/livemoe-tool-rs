@@ -45,7 +45,7 @@ export interface CursorStyleSheet {
   SizeWait: string;
 }
 
-interface Tools {
+export interface Tools {
   GetSysListViewPosition: () => Array<POINT>;
   GetSysTaskbarState: () => TaskbarState;
   GetSysListViewIconRect: () => Array<RECT>;
