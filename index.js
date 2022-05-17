@@ -17,4 +17,5 @@ module.exports = {
   ShowShellWindow: Addon.ShowShellWindow,
   HideShellWindow: Addon.HideShellWindow,
   QueryUserState: Addon.QueryUserState,
+  IsInDesktop: Addon.IsInDesktop,
 };
