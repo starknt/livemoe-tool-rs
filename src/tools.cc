@@ -68,14 +68,6 @@ Napi::Value GetSysListViewPosition(const Napi::CallbackInfo &info)
 		pointObj.Set("x", pt.x);
 		pointObj.Set("y", pt.y);
 		array.Set(c++, pointObj);
-
-		// PCITEMID_CHILD apidl[1] = { spidl };
-
-		// // printf("%4d, %4d\n", ppt.x, ppt.y);
-
-		// spView->SelectAndPositionItems(1, apidl, &pt, SVSI_POSITIONITEM);
-
-		// wprintf_s(L"At %4d, %4d is %ls\n", pt.x, pt.y, spszName);
 	}
 	return array;
 }
@@ -268,13 +260,6 @@ Napi::Value RestoreTaskbar(const Napi::CallbackInfo &info)
 	return Napi::Boolean::New(env, true);
 }
 
-Napi::Number CheckFullScreen(const Napi::CallbackInfo &info)
-{
-	Napi::Env env = info.Env();
-
-	return Napi::Number::New(env, _checkFullScreen());
-}
-
 Napi::Value SetSystemCursorToNode(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
@@ -422,4 +407,9 @@ Napi::Value QueryUserState(const Napi::CallbackInfo &info)
 	SHQueryUserNotificationState(&pquns);
 
 	return Napi::Number::New(env, pquns);
+}
+
+Napi::Value IsInDesktop(const Napi::CallbackInfo &info)
+{
+	return Napi::Boolean::New(info.Env(), IsDesktop());
 }

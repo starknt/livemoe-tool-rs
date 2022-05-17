@@ -20,6 +20,7 @@ Object Init(Env env, Object exports)
     exports.Set("ShowShellWindow", Function::New(env, ShowShellWindow));
     exports.Set("HideShellWindow", Function::New(env, HideShellWindow));
     exports.Set("QueryUserState", Function::New(env, QueryUserState));
+    exports.Set("IsInDesktop", Function::New(env, IsInDesktop));
     return exports;
 }
 

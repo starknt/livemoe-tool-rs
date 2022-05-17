@@ -62,7 +62,9 @@ interface Tools {
   ShowShellWindow: () => boolean;
   HideShellWindow: () => boolean;
   QueryUserState: () => number;
+  IsInDesktop: () => boolean;
 }
+
 
 const tools: Tools;
 

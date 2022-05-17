@@ -58,7 +58,7 @@ void CreateWorkerWindow()
 BOOL _checkAeroEnable()
 {
 	//注意这DWM API在Vista/Win7系统以上才有的
-	//win8/win10是不需要判断的会一直返回TRUE
+	// win8/win10是不需要判断的会一直返回TRUE
 	BOOL bEnabled = FALSE;
 	HMODULE hModuleDwm = LoadLibrary(TEXT("Dwmapi.dll"));
 	if (hModuleDwm != 0)
@@ -97,45 +97,51 @@ BOOL _enableAero()
 	return false;
 }
 
-int _checkFullScreen() {
-	QUERY_USER_NOTIFICATION_STATE pquns;
-
-	SHQueryUserNotificationState(&pquns);
-
-	return pquns;
-}
-
 HWND FindSysFoldViewWindow()
 {
-    UINT uFindCount = 0;
-    HWND hSysListView32Wnd = NULL;
-    while (NULL == hSysListView32Wnd && uFindCount < 10)
-    {
-        HWND hParentWnd = ::GetShellWindow();
-        HWND hSHELLDLL_DefViewWnd = ::FindWindowEx(hParentWnd, NULL, "SHELLDLL_DefView", NULL);
-        hSysListView32Wnd = ::FindWindowEx(hSHELLDLL_DefViewWnd, NULL, "SysListView32", "FolderView");
+	UINT uFindCount = 0;
+	HWND hSysListView32Wnd = NULL;
+	while (NULL == hSysListView32Wnd && uFindCount < 10)
+	{
+		HWND hParentWnd = ::GetShellWindow();
+		HWND hSHELLDLL_DefViewWnd = ::FindWindowEx(hParentWnd, NULL, "SHELLDLL_DefView", NULL);
+		hSysListView32Wnd = ::FindWindowEx(hSHELLDLL_DefViewWnd, NULL, "SysListView32", "FolderView");
 
-        if (NULL == hSysListView32Wnd)
-        {
-            hParentWnd = ::FindWindowEx(NULL, NULL, "WorkerW", "");
-            while ((!hSHELLDLL_DefViewWnd) && hParentWnd)
-            {
-                hSHELLDLL_DefViewWnd = ::FindWindowEx(hParentWnd, NULL, "SHELLDLL_DefView", NULL);
-                hParentWnd = FindWindowEx(NULL, hParentWnd, "WorkerW", "");
-            }
-            hSysListView32Wnd = ::FindWindowEx(hSHELLDLL_DefViewWnd, 0, "SysListView32", "FolderView");
-        }
+		if (NULL == hSysListView32Wnd)
+		{
+			hParentWnd = ::FindWindowEx(NULL, NULL, "WorkerW", "");
+			while ((!hSHELLDLL_DefViewWnd) && hParentWnd)
+			{
+				hSHELLDLL_DefViewWnd = ::FindWindowEx(hParentWnd, NULL, "SHELLDLL_DefView", NULL);
+				hParentWnd = FindWindowEx(NULL, hParentWnd, "WorkerW", "");
+			}
+			hSysListView32Wnd = ::FindWindowEx(hSHELLDLL_DefViewWnd, 0, "SysListView32", "FolderView");
+		}
 
-        if (NULL == hSysListView32Wnd)
-        {
-            Sleep(1000);
-            uFindCount++;
-        }
-        else
-        {
-            break;
-        }
-    }
+		if (NULL == hSysListView32Wnd)
+		{
+			Sleep(1000);
+			uFindCount++;
+		}
+		else
+		{
+			break;
+		}
+	}
 
-    return hSysListView32Wnd;
+	return hSysListView32Wnd;
+}
+
+BOOL IsDesktop()
+{
+	if (!workerw)
+	{
+		FindWorkerWWindow();
+	}
+	POINT point;
+	GetCursorPos(&point);
+	HWND pointWindow = WindowFromPoint(point);
+	HWND current_win_foreg = GetForegroundWindow();
+
+	return current_win_foreg == workerw || pointWindow == FoldView;
 }
