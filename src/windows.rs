@@ -1,17 +1,25 @@
 mod macros;
-mod windef;
 mod swca;
 mod user32;
+mod windef;
 
-use winapi::shared::basetsd::PDWORD_PTR;
-use winapi::um::winuser::{ FindWindowExW, FindWindowW, SendMessageTimeoutW, SMTO_NORMAL, EnumWindows, SetParent, SW_SHOW, ShowWindow, SW_HIDE, GetShellWindow };
-use winapi::um::shellapi::{SHQueryUserNotificationState, QUERY_USER_NOTIFICATION_STATE  };
-use winapi::shared::windef::HWND;
+use crate::windows::user32::get_set_window_composition_attribute_func;
 use std::isize;
+use std::mem::{size_of_val, transmute};
 use std::ptr::null_mut;
+use winapi::shared::basetsd::PDWORD_PTR;
+use winapi::shared::windef::HWND;
+use winapi::um::dwmapi::{DwmSetWindowAttribute, DWMWINDOWATTRIBUTE};
+use winapi::um::shellapi::{SHQueryUserNotificationState, QUERY_USER_NOTIFICATION_STATE};
+use winapi::um::winuser::{
+  EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, SendMessageTimeoutW, SetParent,
+  ShowWindow, SMTO_NORMAL, SW_HIDE, SW_SHOW,
+};
+
+use self::swca::{AccentPolicy, WindowCompositionAttribute, ACCENT, WinCompositionData};
+use self::user32::WINDOWCOMPOSITIONATTRIBDATA;
 use self::windef::SyncHWND;
 use super::TEXT;
-
 
 static mut WORKERW: SyncHWND = SyncHWND(null_mut());
 static mut DEF_VIEW: SyncHWND = SyncHWND(null_mut());
@@ -19,22 +27,23 @@ static mut __WORKERW: SyncHWND = SyncHWND(null_mut());
 static mut FOLD_VIEW: SyncHWND = SyncHWND(null_mut());
 
 fn find_progman_window() -> HWND {
-  unsafe {
-	  FindWindowW(TEXT!("Progman"), TEXT!("Program Manager"))
-  }
+  unsafe { FindWindowW(TEXT!("Progman"), TEXT!("Program Manager")) }
 }
 
 fn find_tray_shell_window() -> HWND {
-  unsafe {
-      FindWindowW(TEXT!("Shell_TrayWnd"), TEXT!(""))
-  }
+  unsafe { FindWindowW(TEXT!("Shell_TrayWnd"), TEXT!("")) }
 }
 
 fn find_peek_window() -> HWND {
   unsafe {
     let tray = find_tray_shell_window();
-	  let notify = FindWindowExW(tray, null_mut(), TEXT!("TrayNotifyWnd"), TEXT!(""));
-	  FindWindowExW(notify, null_mut(), TEXT!("TrayShowDesktopButtonWClass"), TEXT!(""))
+    let notify = FindWindowExW(tray, null_mut(), TEXT!("TrayNotifyWnd"), TEXT!(""));
+    FindWindowExW(
+      notify,
+      null_mut(),
+      TEXT!("TrayShowDesktopButtonWClass"),
+      TEXT!(""),
+    )
   }
 }
 
@@ -49,16 +58,20 @@ fn create_worker_window() {
 unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> i32 {
   let def_view = FindWindowExW(h_wnd, null_mut(), TEXT!("SHELLDLL_DefView"), TEXT!(""));
 
-  if !def_view.is_null()
-  {
+  if !def_view.is_null() {
     DEF_VIEW.0 = def_view;
     __WORKERW.0 = h_wnd;
-    FOLD_VIEW.0 = FindWindowExW(DEF_VIEW.0, null_mut(), TEXT!("SysListView32"), TEXT!("FolderView"));
+    FOLD_VIEW.0 = FindWindowExW(
+      DEF_VIEW.0,
+      null_mut(),
+      TEXT!("SysListView32"),
+      TEXT!("FolderView"),
+    );
     WORKERW.0 = FindWindowExW(null_mut(), h_wnd, TEXT!("WorkerW"), TEXT!(""));
     return 0;
   }
 
-	1
+  1
 }
 
 fn find_worker_window() -> HWND {
@@ -79,18 +92,38 @@ fn find_sys_folder_view_window() -> HWND {
 
     while h_sys_list_view32_wnd.is_null() && u_find_count < 10 {
       let mut h_parent_wnd: HWND = GetShellWindow();
-      let mut h_shell_dll_wnd = FindWindowExW(h_parent_wnd, null_mut(), TEXT!("SHELLDLL_DefView"), null_mut());
-      h_sys_list_view32_wnd = FindWindowExW(h_shell_dll_wnd, null_mut(), TEXT!("SysListView32"), TEXT!("FolderView"));
+      let mut h_shell_dll_wnd = FindWindowExW(
+        h_parent_wnd,
+        null_mut(),
+        TEXT!("SHELLDLL_DefView"),
+        null_mut(),
+      );
+      h_sys_list_view32_wnd = FindWindowExW(
+        h_shell_dll_wnd,
+        null_mut(),
+        TEXT!("SysListView32"),
+        TEXT!("FolderView"),
+      );
 
       if h_sys_list_view32_wnd.is_null() {
         h_parent_wnd = FindWindowExW(null_mut(), null_mut(), TEXT!("WorkerW"), TEXT!(""));
-        
+
         while h_shell_dll_wnd.is_null() && !h_parent_wnd.is_null() {
-          h_shell_dll_wnd = FindWindowExW(h_parent_wnd, null_mut(), TEXT!("SHELLDLL_DefView"), null_mut());
+          h_shell_dll_wnd = FindWindowExW(
+            h_parent_wnd,
+            null_mut(),
+            TEXT!("SHELLDLL_DefView"),
+            null_mut(),
+          );
           h_parent_wnd = FindWindowExW(null_mut(), h_parent_wnd, TEXT!("WorkerW"), TEXT!(""));
         }
 
-        h_sys_list_view32_wnd = FindWindowExW(h_shell_dll_wnd, null_mut(), TEXT!("SysListView32"), TEXT!("FolderView"));
+        h_sys_list_view32_wnd = FindWindowExW(
+          h_shell_dll_wnd,
+          null_mut(),
+          TEXT!("SysListView32"),
+          TEXT!("FolderView"),
+        );
       }
 
       if h_sys_list_view32_wnd.is_null() {
@@ -125,7 +158,7 @@ pub fn restore_window_worker() {
     if WORKERW.0.is_null() {
       find_worker_window();
     }
-    
+
     ShowWindow(WORKERW.0, SW_HIDE);
   }
 }
@@ -159,7 +192,7 @@ pub fn hide_desktop_icon() {
 pub fn show_shell_window() {
   unsafe {
     let shell = find_tray_shell_window();
-  
+
     if !shell.is_null() {
       ShowWindow(shell, SW_SHOW);
     }
@@ -172,6 +205,59 @@ pub fn hide_shell_window() {
 
     if !shell.is_null() {
       ShowWindow(shell, SW_HIDE);
+    }
+  }
+}
+
+pub fn show_peek_window() {
+  let peek = find_peek_window();
+
+  if !peek.is_null() {
+    unsafe {
+      ShowWindow(peek, SW_SHOW);
+    }
+  }
+}
+
+pub fn hide_peek_window() {
+  let peek = find_peek_window();
+
+  if !peek.is_null() {
+    unsafe {
+      ShowWindow(peek, SW_HIDE);
+    }
+  }
+}
+
+pub fn set_taskbar_style(accept: ACCENT, color: u32) -> bool {
+  let tray = find_tray_shell_window();
+
+  if tray.is_null() {
+    return false;
+  }
+
+  let set_window_composition_attribute: _ = if let Some(f) = get_set_window_composition_attribute_func() {
+    f
+} else {
+    return false;
+};
+
+  unsafe {
+    let data = WINDOWCOMPOSITIONATTRIBDATA {
+        Attrib: 19,
+        pvData: todo!(),
+        cbData: todo!(),
+    };
+    
+  }
+}
+
+pub fn restore_taskbar_style() {
+  let tray = find_tray_shell_window();
+
+  if !tray.is_null() {
+    unsafe {
+      let set_taskbar_style = get_set_window_composition_attribute_func();
     }
   }
 }
@@ -204,5 +290,10 @@ mod test {
     println!("{}", query_user_state());
 
     assert!(query_user_state() > 0);
+  }
+
+  #[test]
+  fn test_set_taskbar_style() {
+    set_taskbar_style(ACCENT::AccentEnableTransparentGradient, 0x0);
   }
 }
