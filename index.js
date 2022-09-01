@@ -236,10 +236,6 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { setWindowWorker, restoreWindowWorker, showDesktopIcon, hideDesktopIcon, UserState } = nativeBinding
+const { UserState } = nativeBinding
 
-module.exports.setWindowWorker = setWindowWorker
-module.exports.restoreWindowWorker = restoreWindowWorker
-module.exports.showDesktopIcon = showDesktopIcon
-module.exports.hideDesktopIcon = hideDesktopIcon
 module.exports.UserState = UserState
