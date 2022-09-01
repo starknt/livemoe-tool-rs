@@ -4,15 +4,16 @@ mod windows;
 #[cfg(windows)]
 #[allow(unused)]
 mod exports_windows {
-  use napi_derive::napi;
-
   use super::windows::{
     hide_desktop_icon as hide_desktop_icon_win, hide_peek_window as hide_peek_window_win,
     hide_shell_window as hide_shell_window_win, query_user_state as query_user_state_win,
-    restore_window_worker as restore_window_worker_win, set_window_worker as set_window_worker_win,
-    show_desktop_icon as show_desktop_icon_win, show_peek_window as show_peek_window_win,
-    show_shell_window as show_shell_window_win,
+    restore_taskbar_style as restore_taskbar_style_win,
+    restore_window_worker as restore_window_worker_win, set_taskbar_style as set_taskbar_style_win,
+    set_window_worker as set_window_worker_win, show_desktop_icon as show_desktop_icon_win,
+    show_peek_window as show_peek_window_win, show_shell_window as show_shell_window_win,
   };
+  use crate::exports_common::ACCENT;
+  use napi_derive::napi;
 
   #[napi]
   pub fn set_window_worker(h_wnd: u32) {
@@ -58,6 +59,16 @@ mod exports_windows {
   pub fn query_user_state() -> u32 {
     query_user_state_win()
   }
+
+  #[napi]
+  pub fn set_taskbar_style(accept: ACCENT, color: u32) -> bool {
+    set_taskbar_style_win(accept, color)
+  }
+
+  #[napi]
+  pub fn restore_taskbar_style() -> bool {
+    restore_taskbar_style_win()
+  }
 }
 
 mod exports_common {
@@ -83,6 +94,12 @@ mod exports_common {
     AccentEnableFluent = 4, // Use an aspect similar to Fluent design. nColor is tint color. This mode bugs if the alpha value is 0.
     AccentNormal = 150,
   }
+
+  impl Into<u32> for ACCENT {
+    fn into(self) -> u32 {
+      self as u32
+    }
+  }
 }
 
 mod exports_linux {}
@@ -97,6 +114,12 @@ pub fn set_window_worker(h_wnd: u32) {
 
 #[cfg(not(windows))]
 #[napi]
+pub fn restore_window_worker() {
+  todo!()
+}
+
+#[cfg(not(windows))]
+#[napi]
 pub fn show_desktop_icon() {
   todo!()
 }
@@ -105,4 +128,46 @@ pub fn show_desktop_icon() {
 #[napi]
 pub fn hide_desktop_icon() {
   todo!()
+}
+
+#[cfg(not(windows))]
+#[napi]
+pub fn show_shell_window() {
+  todo!()
+}
+
+#[cfg(not(windows))]
+#[napi]
+pub fn hide_shell_window() {
+  todo!()
+}
+
+#[cfg(not(windows))]
+#[napi]
+pub fn show_peek_window() {
+  todo!()
+}
+
+#[cfg(not(windows))]
+#[napi]
+pub fn hide_peek_window() {
+  todo!()
+}
+
+#[cfg(not(windows))]
+#[napi]
+pub fn query_user_state() -> u32 {
+  5
+}
+
+#[cfg(not(windows))]
+#[napi]
+pub fn set_taskbar_style(accept: ACCENT, color: u32) -> bool {
+  true
+}
+
+#[cfg(not(windows))]
+#[napi]
+pub fn restore_taskbar_style() -> bool {
+  true
 }

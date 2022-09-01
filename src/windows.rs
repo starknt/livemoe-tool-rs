@@ -1,25 +1,21 @@
 mod macros;
-mod swca;
 mod user32;
 mod windef;
 
+use self::user32::{ACCENTPOLICY, WINDOWCOMPOSITIONATTRIBDATA};
+use self::windef::SyncHWND;
+use super::TEXT;
+use crate::exports_common::ACCENT;
 use crate::windows::user32::get_set_window_composition_attribute_func;
 use std::isize;
-use std::mem::{size_of_val, transmute};
 use std::ptr::null_mut;
 use winapi::shared::basetsd::PDWORD_PTR;
 use winapi::shared::windef::HWND;
-use winapi::um::dwmapi::{DwmSetWindowAttribute, DWMWINDOWATTRIBUTE};
 use winapi::um::shellapi::{SHQueryUserNotificationState, QUERY_USER_NOTIFICATION_STATE};
 use winapi::um::winuser::{
   EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, SendMessageTimeoutW, SetParent,
   ShowWindow, SMTO_NORMAL, SW_HIDE, SW_SHOW,
 };
-
-use self::swca::{AccentPolicy, WindowCompositionAttribute, ACCENT, WinCompositionData};
-use self::user32::WINDOWCOMPOSITIONATTRIBDATA;
-use self::windef::SyncHWND;
-use super::TEXT;
 
 static mut WORKERW: SyncHWND = SyncHWND(null_mut());
 static mut DEF_VIEW: SyncHWND = SyncHWND(null_mut());
@@ -229,37 +225,57 @@ pub fn hide_peek_window() {
   }
 }
 
-pub fn set_taskbar_style(accept: ACCENT, color: u32) -> bool {
-  let tray = find_tray_shell_window();
-
-  if tray.is_null() {
-    return false;
-  }
-
-  let set_window_composition_attribute: _ = if let Some(f) = get_set_window_composition_attribute_func() {
-    f
-} else {
-    return false;
-};
+fn set_taskbar_window_blur(taskbar: HWND, accept: ACCENT, color: u32) -> bool {
+    let set_window_composition_attribute: _ =
+    if let Some(f) = get_set_window_composition_attribute_func() {
+      f
+    } else {
+      return false;
+    };
 
   unsafe {
-    let data = WINDOWCOMPOSITIONATTRIBDATA {
-        Attrib: 19,
-        pvData: todo!(),
-        cbData: todo!(),
+    let mut policy = ACCENTPOLICY {
+      nAccentState: accept.into(),
+      nFlags: 2,
+      nColor: (color & 0xFF00FF00) + ((color & 0x00FF0000) >> 16) + ((color & 0x000000FF) << 16),
+      nAnimationId: 0,
     };
-    
+
+    if policy.nAccentState == ACCENT::AccentEnableFluent.into() && policy.nColor >> 24 == 0x00 {
+      // Fluent mode doesn't likes a completely 0 opacity
+      policy.nColor = (0x01 << 24) + (policy.nColor & 0x00FFFFFF);
+    }
+
+    let mut data = WINDOWCOMPOSITIONATTRIBDATA {
+      Attrib: 19,
+      pvData: &mut policy as *mut _ as _,
+      cbData: std::mem::size_of_val(&policy) as _,
+    };
+
+    set_window_composition_attribute(taskbar, &mut data as *mut _);
+
+    true
   }
 }
 
-pub fn restore_taskbar_style() {
-  let tray = find_tray_shell_window();
+pub fn set_taskbar_style(accept: ACCENT, color: u32) -> bool {
+  let taskbar = find_tray_shell_window();
 
-  if !tray.is_null() {
-    unsafe {
-      let set_taskbar_style = get_set_window_composition_attribute_func();
-    }
+  if taskbar.is_null() {
+    return false;
   }
+
+  set_taskbar_window_blur(taskbar, accept, color)
+}
+
+pub fn restore_taskbar_style() -> bool {
+  let taskbar = find_tray_shell_window();
+
+  if taskbar.is_null() {
+    return false;
+  }
+
+  set_taskbar_window_blur(taskbar, ACCENT::AccentNormal, 0x0)
 }
 
 pub fn query_user_state() -> u32 {
@@ -294,6 +310,11 @@ mod test {
 
   #[test]
   fn test_set_taskbar_style() {
-    set_taskbar_style(ACCENT::AccentEnableTransparentGradient, 0x0);
+    set_taskbar_style(ACCENT::AccentEnableFluent, 0x0);
+  }
+
+  #[test]
+  fn test_restore_taskbar_style() {
+    restore_taskbar_style();
   }
 }
