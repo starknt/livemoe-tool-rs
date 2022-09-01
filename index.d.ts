@@ -14,6 +14,7 @@ export function hidePeekWindow(): void
 export function queryUserState(): number
 export function setTaskbarStyle(accept: ACCENT, color: number): boolean
 export function restoreTaskbarStyle(): boolean
+export function getSysListViewIconRect(): Array<RECT>
 export const enum UserState {
   QunsNotPresent = 1,
   QunsBusy = 2,
@@ -22,6 +23,12 @@ export const enum UserState {
   QunsAcceptsNotifications = 5,
   QunsQuietTime = 6,
   QunsApp = 7
+}
+export interface Rect {
+  top: number
+  left: number
+  right: number
+  bottom: number
 }
 export const enum ACCENT {
   AccentEnableGradient = 1,

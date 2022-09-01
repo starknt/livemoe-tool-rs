@@ -236,7 +236,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { setWindowWorker, restoreWindowWorker, showDesktopIcon, hideDesktopIcon, showShellWindow, hideShellWindow, showPeekWindow, hidePeekWindow, queryUserState, setTaskbarStyle, restoreTaskbarStyle, UserState, ACCENT } = nativeBinding
+const { setWindowWorker, restoreWindowWorker, showDesktopIcon, hideDesktopIcon, showShellWindow, hideShellWindow, showPeekWindow, hidePeekWindow, queryUserState, setTaskbarStyle, restoreTaskbarStyle, getSysListViewIconRect, UserState, ACCENT } = nativeBinding
 
 module.exports.setWindowWorker = setWindowWorker
 module.exports.restoreWindowWorker = restoreWindowWorker
@@ -249,5 +249,6 @@ module.exports.hidePeekWindow = hidePeekWindow
 module.exports.queryUserState = queryUserState
 module.exports.setTaskbarStyle = setTaskbarStyle
 module.exports.restoreTaskbarStyle = restoreTaskbarStyle
+module.exports.getSysListViewIconRect = getSysListViewIconRect
 module.exports.UserState = UserState
 module.exports.ACCENT = ACCENT
