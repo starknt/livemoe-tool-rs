@@ -11,9 +11,11 @@ crate-type = ["cdylib"]
 # Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
 napi = { version = "2.9.0", default-features = false, features = ["napi4"] }
 napi-derive = "2.9.0"
+lazy_static = "1.4.0"
+
 
 [target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3.9", features = ["winuser", "shellapi"] }
+winapi = { version = "0.3.9", features = ["winuser", "shellapi", "dwmapi"] }
 
 [build-dependencies]
 napi-build = "2.0.1"
