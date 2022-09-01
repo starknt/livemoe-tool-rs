@@ -1,3 +1,5 @@
 // Vitest Snapshot v1
 
 exports[` 1`] = `undefined`;
+
+exports[` 3`] = `true`;

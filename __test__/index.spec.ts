@@ -1,9 +1,10 @@
 import { beforeAll, expect } from 'vitest'
 import { test } from 'vitest'
 
-import { hideDesktopIcon, setWindowWorker, restoreWindowWorker } from '../index'
+import { hideDesktopIcon, setWindowWorker, restoreWindowWorker, setTaskbarStyle, ACCENT } from '../index'
 
 test('', () => {
-  expect(restoreWindowWorker()).toMatchSnapshot()
+  expect(restoreWindowWorker()).toMatchInlineSnapshot('undefined')
   expect(hideDesktopIcon()).toMatchInlineSnapshot('undefined')
+  expect(setTaskbarStyle(ACCENT.AccentNormal, 0x0)).toMatchInlineSnapshot('true')
 })
