@@ -5,16 +5,25 @@ mod windef;
 use self::user32::{ACCENTPOLICY, WINDOWCOMPOSITIONATTRIBDATA};
 use self::windef::SyncHWND;
 use super::TEXT;
-use crate::exports_common::ACCENT;
+use crate::exports_common::{ACCENT, RECT};
 use crate::windows::user32::get_set_window_composition_attribute_func;
 use std::isize;
 use std::ptr::null_mut;
 use winapi::shared::basetsd::PDWORD_PTR;
-use winapi::shared::windef::HWND;
+use winapi::shared::minwindef::{DWORD, LPARAM};
+use winapi::shared::ntdef::FALSE;
+use winapi::shared::windef::{HWND};
+use winapi::um::commctrl::{LVM_GETITEMCOUNT, LVM_GETITEMRECT};
+use winapi::um::memoryapi::{ReadProcessMemory, VirtualAllocEx, WriteProcessMemory};
+use winapi::um::processthreadsapi::OpenProcess;
 use winapi::um::shellapi::{SHQueryUserNotificationState, QUERY_USER_NOTIFICATION_STATE};
+use winapi::um::winnt::{
+  MEM_COMMIT, PAGE_READWRITE, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ,
+  PROCESS_VM_WRITE,
+};
 use winapi::um::winuser::{
-  EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, SendMessageTimeoutW, SetParent,
-  ShowWindow, SMTO_NORMAL, SW_HIDE, SW_SHOW,
+  EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, GetWindowThreadProcessId,
+  SendMessageTimeoutW, SendMessageW, SetParent, ShowWindow, SMTO_NORMAL, SW_HIDE, SW_SHOW,
 };
 
 static mut WORKERW: SyncHWND = SyncHWND(null_mut());
@@ -226,7 +235,7 @@ pub fn hide_peek_window() {
 }
 
 fn set_taskbar_window_blur(taskbar: HWND, accept: ACCENT, color: u32) -> bool {
-    let set_window_composition_attribute: _ =
+  let set_window_composition_attribute: _ =
     if let Some(f) = get_set_window_composition_attribute_func() {
       f
     } else {
@@ -288,6 +297,71 @@ pub fn query_user_state() -> u32 {
   }
 }
 
+pub fn get_sys_list_view_icon_rect() -> Vec<RECT> {
+  let fold_view = find_sys_folder_view_window();
+  let mut rects: Vec<RECT> = vec![];
+
+  if !fold_view.is_null() {
+    unsafe {
+      let n_max_item: usize = SendMessageW(fold_view, LVM_GETITEMCOUNT, 0, 0) as usize;
+      let mut pid: DWORD = 0;
+      GetWindowThreadProcessId(fold_view, &mut pid);
+      let handle = OpenProcess(
+        PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION,
+        FALSE as i32,
+        pid,
+      );
+
+      if !handle.is_null() {
+        let prc = VirtualAllocEx(
+          handle,
+          null_mut(),
+          std::mem::size_of::<RECT>(),
+          MEM_COMMIT,
+          PAGE_READWRITE,
+        );
+
+        if !prc.is_null() {
+          let mut i: usize = 0;
+          let mut num_read: usize = 0;
+          while i < n_max_item {
+            let mut rect = RECT {
+              left: 0,
+              top: 0,
+              right: 0,
+              bottom: 0,
+            };
+
+            WriteProcessMemory(
+              handle,
+              prc,
+              &mut rect as *mut _ as _,
+              std::mem::size_of::<RECT>(),
+              null_mut(),
+            );
+            SendMessageW(fold_view, LVM_GETITEMRECT, i, prc as LPARAM);
+            let r = ReadProcessMemory(
+              handle,
+              prc,
+              &mut rect as *mut _ as _,
+              std::mem::size_of::<RECT>(),
+              &mut num_read as *mut usize,
+            );
+
+            if r > 0 {
+              rects.push(rect);
+            }
+
+            i += 1;
+          }
+        }
+      }
+    }
+  }
+
+ rects
+}
+
 #[cfg(test)]
 mod test {
 
@@ -316,5 +390,10 @@ mod test {
   #[test]
   fn test_restore_taskbar_style() {
     restore_taskbar_style();
+  }
+
+  #[test]
+  fn test_get_sys_folder_view() {
+    get_sys_list_view_icon_rect();
   }
 }
