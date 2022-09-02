@@ -2,7 +2,7 @@
   "name": "@livemoe/tools-win32-x64-msvc",
   "packageManager": "pnpm@7.6.0",
   "version": "0.0.1",
-  "os": [s
+  "os": [
     "win32"
   ],
   "cpu": [
