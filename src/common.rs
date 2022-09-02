@@ -65,3 +65,31 @@ impl Into<u32> for ACCENT {
     self as u32
   }
 }
+
+#[napi(object)]
+pub struct Color {
+  pub r: u32,
+  pub g: u32,
+  pub b: u32,
+  pub a: u32,
+}
+
+impl Color {
+  pub fn new(r: Option<u32>, g: Option<u32>, b: Option<u32>, a: Option<u32>) -> Color {
+    let _r = if let Some(r) = r { r } else { 0 };
+    let _g = if let Some(g) = g { g } else { 0 };
+    let _b = if let Some(b) = b { b } else { 0 };
+    let _a = if let Some(a) = a { a } else { 0 };
+
+    Color {
+      r: _r,
+      g: _g,
+      b: _b,
+      a: _a,
+    }
+  }
+
+  pub fn to_argb(&self) -> u32 {
+    self.a << 24 | self.r << 16 | self.g << 8 | self.b << 0
+  }
+}

@@ -6,7 +6,7 @@ mod windows;
 #[cfg(windows)]
 #[allow(unused)]
 mod exports_windows {
-  use crate::common::{TaskbarState, ACCENT, RECT};
+  use crate::common::{Color, TaskbarState, ACCENT, RECT};
 
   use super::windows::{
     get_sys_list_view_icon_rect as get_sys_list_view_icon_rect_win,
@@ -69,8 +69,8 @@ mod exports_windows {
   }
 
   #[napi]
-  pub fn set_taskbar_style(accept: ACCENT, color: u32) -> bool {
-    set_taskbar_style_win(accept, color)
+  pub fn set_taskbar_style(accept: ACCENT, color: Color) -> bool {
+    set_taskbar_style_win(accept, color.to_argb())
   }
 
   #[napi]
@@ -108,7 +108,7 @@ mod exports_macos {}
 #[cfg(not(windows))]
 #[allow(unused)]
 mod exports_not_windows {
-  use crate::common::{TaskbarState, ACCENT};
+  use crate::common::{TaskbarState, ACCENT, Color};
   use napi_derive::napi;
 
   #[napi]
@@ -158,7 +158,7 @@ mod exports_not_windows {
   }
 
   #[napi]
-  pub fn set_taskbar_style(accept: ACCENT, color: u32) -> bool {
+  pub fn set_taskbar_style(accept: ACCENT, color: Color) -> bool {
     true
   }
 
