@@ -108,7 +108,7 @@ mod exports_macos {}
 #[cfg(not(windows))]
 #[allow(unused)]
 mod exports_not_windows {
-  use common::{TaskbarState, ACCENT};
+  use crate::common::{TaskbarState, ACCENT};
   use napi_derive::napi;
 
   #[napi]
