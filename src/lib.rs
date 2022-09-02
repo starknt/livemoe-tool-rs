@@ -1,5 +1,6 @@
 #![deny(clippy::all)]
 mod common;
+#[cfg(windows)]
 mod windows;
 
 #[cfg(windows)]
@@ -105,6 +106,7 @@ mod exports_linux {}
 mod exports_macos {}
 
 #[cfg(not(windows))]
+#[allow(unused)]
 mod exports_not_windows {
   use common::{TaskbarState, ACCENT};
 
