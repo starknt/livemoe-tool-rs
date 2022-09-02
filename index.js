@@ -236,8 +236,11 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { setWindowWorker, restoreWindowWorker, showDesktopIcon, hideDesktopIcon, showShellWindow, hideShellWindow, showPeekWindow, hidePeekWindow, queryUserState, setTaskbarStyle, restoreTaskbarStyle, getSysListViewIconRect, getSysTaskbarState, UserState, Alignment, ACCENT } = nativeBinding
+const { UserState, Alignment, ACCENT, setWindowWorker, restoreWindowWorker, showDesktopIcon, hideDesktopIcon, showShellWindow, hideShellWindow, showPeekWindow, hidePeekWindow, queryUserState, setTaskbarStyle, restoreTaskbarStyle, getSysListViewIconRect, getSysTaskbarState, setSystemCursorStyle, restoreSystemCursorStyle } = nativeBinding
 
+module.exports.UserState = UserState
+module.exports.Alignment = Alignment
+module.exports.ACCENT = ACCENT
 module.exports.setWindowWorker = setWindowWorker
 module.exports.restoreWindowWorker = restoreWindowWorker
 module.exports.showDesktopIcon = showDesktopIcon
@@ -251,6 +254,5 @@ module.exports.setTaskbarStyle = setTaskbarStyle
 module.exports.restoreTaskbarStyle = restoreTaskbarStyle
 module.exports.getSysListViewIconRect = getSysListViewIconRect
 module.exports.getSysTaskbarState = getSysTaskbarState
-module.exports.UserState = UserState
-module.exports.Alignment = Alignment
-module.exports.ACCENT = ACCENT
+module.exports.setSystemCursorStyle = setSystemCursorStyle
+module.exports.restoreSystemCursorStyle = restoreSystemCursorStyle

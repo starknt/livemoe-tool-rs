@@ -1,19 +1,25 @@
 #![deny(clippy::all)]
+mod common;
 mod windows;
 
 #[cfg(windows)]
 #[allow(unused)]
 mod exports_windows {
+  use crate::common::{TaskbarState, ACCENT, RECT};
+
   use super::windows::{
     get_sys_list_view_icon_rect as get_sys_list_view_icon_rect_win,
     get_sys_taskbar_state as get_sys_taskbar_state_win, hide_desktop_icon as hide_desktop_icon_win,
     hide_peek_window as hide_peek_window_win, hide_shell_window as hide_shell_window_win,
-    query_user_state as query_user_state_win, restore_taskbar_style as restore_taskbar_style_win,
-    restore_window_worker as restore_window_worker_win, set_taskbar_style as set_taskbar_style_win,
-    set_window_worker as set_window_worker_win, show_desktop_icon as show_desktop_icon_win,
-    show_peek_window as show_peek_window_win, show_shell_window as show_shell_window_win,
+    query_user_state as query_user_state_win,
+    restore_system_cursor_style as restore_system_cursor_style_win,
+    restore_taskbar_style as restore_taskbar_style_win,
+    restore_window_worker as restore_window_worker_win,
+    set_system_cursor_style as set_system_cursor_style_win,
+    set_taskbar_style as set_taskbar_style_win, set_window_worker as set_window_worker_win,
+    show_desktop_icon as show_desktop_icon_win, show_peek_window as show_peek_window_win,
+    show_shell_window as show_shell_window_win,
   };
-  use crate::exports_common::{TaskbarState, ACCENT, RECT};
   use napi_derive::napi;
 
   #[napi]
@@ -80,75 +86,15 @@ mod exports_windows {
   pub fn get_sys_taskbar_state() -> TaskbarState {
     get_sys_taskbar_state_win()
   }
-}
-
-mod exports_common {
-  use napi::bindgen_prelude::*;
-  use napi_derive::napi;
 
   #[napi]
-  pub enum UserState {
-    QunsNotPresent = 1,
-    QunsBusy = 2,
-    QunsRunningD3dFullScreen = 3,
-    QunsPresentationMode = 4,
-    QunsAcceptsNotifications = 5,
-    QunsQuietTime = 6,
-    QunsApp = 7,
-  }
-
-  #[napi(object)]
-  #[derive(Debug)]
-  pub struct RECT {
-    pub top: i32,
-    pub left: i32,
-    pub right: i32,
-    pub bottom: i32,
+  pub fn set_system_cursor_style() {
+    set_system_cursor_style_win()
   }
 
   #[napi]
-  #[derive(Debug)]
-  pub enum Alignment {
-    Left,
-    Top,
-    Right,
-    Bottom,
-  }
-
-  #[napi(object)]
-  #[derive(Debug)]
-  pub struct TaskbarState {
-    pub rc: RECT,
-    pub alignment: Alignment,
-  }
-
-  impl TaskbarState {
-    pub fn new() -> TaskbarState {
-      TaskbarState {
-        rc: RECT {
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-        },
-        alignment: Alignment::Left,
-      }
-    }
-  }
-
-  #[napi]
-  pub enum ACCENT {
-    AccentEnableGradient = 1, // Use a solid color specified by nColor. This mode ignores the alpha value and is fully opaque.
-    AccentEnableTransparentgradient = 2, // Use a tinted transparent overlay. nColor is the tint color.
-    AccentEnableBlurbehind = 3,          // Use a tinted blurry overlay. nColor is the tint color.
-    AccentEnableFluent = 4, // Use an aspect similar to Fluent design. nColor is tint color. This mode bugs if the alpha value is 0.
-    AccentNormal = 150,
-  }
-
-  impl Into<u32> for ACCENT {
-    fn into(self) -> u32 {
-      self as u32
-    }
+  pub fn restore_system_cursor_style() {
+    restore_system_cursor_style_win()
   }
 }
 
@@ -160,7 +106,7 @@ mod exports_macos {}
 
 #[cfg(not(windows))]
 mod exports_not_windows {
-  use crate::exports_common::TaskbarState;
+  use common::{TaskbarState, ACCENT};
 
   #[napi]
   pub fn set_window_worker(h_wnd: u32) {

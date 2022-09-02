@@ -5,7 +5,7 @@ mod windef;
 use self::user32::{ACCENTPOLICY, WINDOWCOMPOSITIONATTRIBDATA};
 use self::windef::SyncHWND;
 use super::TEXT;
-use crate::exports_common::{ACCENT, RECT, TaskbarState, Alignment};
+use crate::common::{Alignment, TaskbarState, ACCENT, RECT};
 use crate::windows::user32::get_set_window_composition_attribute_func;
 use std::isize;
 use std::ptr::null_mut;
@@ -27,7 +27,8 @@ use winapi::um::winnt::{
 };
 use winapi::um::winuser::{
   EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, GetWindowThreadProcessId,
-  SendMessageTimeoutW, SendMessageW, SetParent, ShowWindow, SMTO_NORMAL, SW_HIDE, SW_SHOW,
+  LoadCursorFromFileW, SendMessageTimeoutW, SendMessageW, SetParent, SetSystemCursor, ShowWindow,
+  SystemParametersInfoW, SMTO_NORMAL, SPIF_SENDWININICHANGE, SPI_SETCURSORS, SW_HIDE, SW_SHOW,
 };
 
 static mut WORKERW: SyncHWND = SyncHWND(null_mut());
@@ -388,20 +389,20 @@ pub fn get_sys_taskbar_state() -> TaskbarState {
 
   unsafe {
     SHAppBarMessage(ABM_GETTASKBARPOS, &mut data);
-  
+
     match data.uEdge {
       0 => {
         state.alignment = Alignment::Left;
       }
       2 => {
         state.alignment = Alignment::Right;
-      },
+      }
       3 => {
         state.alignment = Alignment::Bottom;
-      },
+      }
       1 => {
         state.alignment = Alignment::Top;
-      },
+      }
       _ => {
         state.alignment = Alignment::Bottom;
       }
@@ -415,6 +416,53 @@ pub fn get_sys_taskbar_state() -> TaskbarState {
     };
 
     state
+  }
+}
+
+enum SystemCursorId {
+  AppStarting = 32650,
+  Normal = 32512,
+  Hand = 32649,
+  Cross = 32515,
+  IBeam = 32513,
+  No = 32648,
+  Size = 32640,
+  SizeAll = 32646,
+  SizeNESW = 32643,
+  SizeNS = 32645,
+  SizeNWSE = 32642,
+  SizeWE = 32644,
+  Up = 32516,
+  Wait = 32514,
+}
+
+impl Into<u32> for SystemCursorId {
+  fn into(self) -> u32 {
+    self as u32
+  }
+}
+
+pub fn set_system_cursor_style() {
+  unsafe {
+    SystemParametersInfoW(SPI_SETCURSORS, 0, null_mut(), SPIF_SENDWININICHANGE);
+
+    let app_starting = LoadCursorFromFileW(TEXT!("E:\\Project\\JavaScript\\Electron\\lm-client\\assets\\LiveMoeCursorResource\\BLUE ALIEN\\AppStarting.ani"));
+    let arrow = LoadCursorFromFileW(TEXT!("E:\\Project\\JavaScript\\Electron\\lm-client\\assets\\LiveMoeCursorResource\\BLUE ALIEN\\Arrow.ani"));
+    SetSystemCursor(app_starting, SystemCursorId::AppStarting.into());
+    SetSystemCursor(arrow, SystemCursorId::Normal.into());
+    
+    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
+    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
+    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
+    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
+    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
+    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
+  }
+}
+
+pub fn restore_system_cursor_style() {
+  unsafe {
+    SystemParametersInfoW(SPI_SETCURSORS, 0, null_mut(), SPIF_SENDWININICHANGE);
   }
 }
 
@@ -456,5 +504,10 @@ mod test {
   #[test]
   fn test_get_sys_taskbar_state() {
     println!("{:#?}", get_sys_taskbar_state());
+  }
+
+  #[test]
+  fn test_set_system_cursor_style() {
+    set_system_cursor_style();
   }
 }

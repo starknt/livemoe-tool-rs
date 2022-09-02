@@ -1,7 +1,7 @@
 import { beforeAll, expect } from 'vitest'
 import { test } from 'vitest'
 
-import { hideDesktopIcon, setWindowWorker, restoreWindowWorker, setTaskbarStyle, ACCENT, showDesktopIcon, getSysListViewIconRect } from '../index'
+import { hideDesktopIcon, setWindowWorker, restoreWindowWorker, setTaskbarStyle, ACCENT, showDesktopIcon, getSysListViewIconRect, setSystemCursorStyle, restoreSystemCursorStyle } from '../index'
 
 test('', () => {
   expect(restoreWindowWorker()).toMatchInlineSnapshot('undefined')
@@ -22,5 +22,8 @@ test('', () => {
         "top": 285,
       },
     ]
-  `)
+  `);
+
+  expect(restoreSystemCursorStyle()).toMatchInlineSnapshot('undefined')
+
 })
