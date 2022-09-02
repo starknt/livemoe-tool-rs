@@ -15,6 +15,7 @@ export function queryUserState(): number
 export function setTaskbarStyle(accept: ACCENT, color: number): boolean
 export function restoreTaskbarStyle(): boolean
 export function getSysListViewIconRect(): Array<RECT>
+export function getSysTaskbarState(): TaskbarState
 export const enum UserState {
   QunsNotPresent = 1,
   QunsBusy = 2,
@@ -29,6 +30,16 @@ export interface Rect {
   left: number
   right: number
   bottom: number
+}
+export const enum Alignment {
+  Left = 0,
+  Top = 1,
+  Right = 2,
+  Bottom = 3
+}
+export interface TaskbarState {
+  rc: Rect
+  alignment: Alignment
 }
 export const enum ACCENT {
   AccentEnableGradient = 1,

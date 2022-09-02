@@ -5,22 +5,25 @@ mod windef;
 use self::user32::{ACCENTPOLICY, WINDOWCOMPOSITIONATTRIBDATA};
 use self::windef::SyncHWND;
 use super::TEXT;
-use crate::exports_common::{ACCENT, RECT};
+use crate::exports_common::{ACCENT, RECT, TaskbarState, Alignment};
 use crate::windows::user32::get_set_window_composition_attribute_func;
 use std::isize;
 use std::ptr::null_mut;
 use winapi::shared::basetsd::PDWORD_PTR;
 use winapi::shared::minwindef::{DWORD, LPARAM};
 use winapi::shared::ntdef::FALSE;
-use winapi::shared::windef::{HWND};
+use winapi::shared::windef::{HWND, RECT as WIN_RECT};
 use winapi::um::commctrl::{LVM_GETITEMCOUNT, LVM_GETITEMRECT};
 use winapi::um::handleapi::CloseHandle;
-use winapi::um::memoryapi::{ReadProcessMemory, VirtualAllocEx, WriteProcessMemory, VirtualFreeEx};
+use winapi::um::memoryapi::{ReadProcessMemory, VirtualAllocEx, VirtualFreeEx, WriteProcessMemory};
 use winapi::um::processthreadsapi::OpenProcess;
-use winapi::um::shellapi::{SHQueryUserNotificationState, QUERY_USER_NOTIFICATION_STATE};
+use winapi::um::shellapi::{
+  SHAppBarMessage, SHQueryUserNotificationState, ABM_GETTASKBARPOS, APPBARDATA,
+  QUERY_USER_NOTIFICATION_STATE,
+};
 use winapi::um::winnt::{
-  MEM_COMMIT, PAGE_READWRITE, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ,
-  PROCESS_VM_WRITE, MEM_RELEASE,
+  MEM_COMMIT, MEM_RELEASE, PAGE_READWRITE, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION,
+  PROCESS_VM_READ, PROCESS_VM_WRITE,
 };
 use winapi::um::winuser::{
   EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, GetWindowThreadProcessId,
@@ -363,7 +366,56 @@ pub fn get_sys_list_view_icon_rect() -> Vec<RECT> {
     }
   }
 
- rects
+  rects
+}
+
+pub fn get_sys_taskbar_state() -> TaskbarState {
+  let mut data: APPBARDATA = APPBARDATA {
+    cbSize: std::mem::size_of::<APPBARDATA>() as u32,
+    hWnd: null_mut(),
+    uCallbackMessage: 0,
+    uEdge: 0,
+    rc: WIN_RECT {
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    lParam: 0,
+  };
+
+  let mut state: TaskbarState = TaskbarState::new();
+
+  unsafe {
+    SHAppBarMessage(ABM_GETTASKBARPOS, &mut data);
+  
+    match data.uEdge {
+      0 => {
+        state.alignment = Alignment::Left;
+      }
+      2 => {
+        state.alignment = Alignment::Right;
+      },
+      3 => {
+        state.alignment = Alignment::Bottom;
+      },
+      1 => {
+        state.alignment = Alignment::Top;
+      },
+      _ => {
+        state.alignment = Alignment::Bottom;
+      }
+    }
+
+    state.rc = RECT {
+      left: data.rc.left,
+      top: data.rc.top,
+      right: data.rc.right,
+      bottom: data.rc.bottom,
+    };
+
+    state
+  }
 }
 
 #[cfg(test)]
@@ -399,5 +451,10 @@ mod test {
   #[test]
   fn test_get_sys_folder_view() {
     get_sys_list_view_icon_rect();
+  }
+
+  #[test]
+  fn test_get_sys_taskbar_state() {
+    println!("{:#?}", get_sys_taskbar_state());
   }
 }
