@@ -24,7 +24,7 @@
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "version": "napi version",
     "release": "bumpp package.json npm/*/package.json --commit --push --tag"
   },
