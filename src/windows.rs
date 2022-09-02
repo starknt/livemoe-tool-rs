@@ -450,7 +450,7 @@ pub fn set_system_cursor_style() {
     let arrow = LoadCursorFromFileW(TEXT!("E:\\Project\\JavaScript\\Electron\\lm-client\\assets\\LiveMoeCursorResource\\BLUE ALIEN\\Arrow.ani"));
     SetSystemCursor(app_starting, SystemCursorId::AppStarting.into());
     SetSystemCursor(arrow, SystemCursorId::Normal.into());
-    
+
     // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
     // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
     // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
