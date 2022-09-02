@@ -1,6 +1,6 @@
 {
   "name": "@livemoe/tools",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
@@ -10,7 +10,10 @@
   "license": "MIT",
   "devDependencies": {
     "@napi-rs/cli": "^2.11.1",
-    "vitest": "^0.22.1"
+    "vitest": "^0.22.1",
+    "bumpp": "^8.2.1",
+    "eslint": "^8.23.0",
+    "@antfu/eslint-config": "0.26.2"
   },
   "engines": {
     "node": ">= 10"
@@ -21,7 +24,8 @@
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
     "test": "vitest run",
-    "version": "napi version"
+    "version": "napi version",
+    "release": "bumpp package.json npm/*/package.json --commit --push --tag"
   },
   "optionalDependencies": {
     "@livemoe/tools-win32-x64-msvc": "0.0.0",
