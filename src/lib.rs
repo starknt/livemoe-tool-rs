@@ -109,6 +109,7 @@ mod exports_macos {}
 #[allow(unused)]
 mod exports_not_windows {
   use common::{TaskbarState, ACCENT};
+  use napi_derive::napi;
 
   #[napi]
   pub fn set_window_worker(h_wnd: u32) {
