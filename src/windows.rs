@@ -14,12 +14,13 @@ use winapi::shared::minwindef::{DWORD, LPARAM};
 use winapi::shared::ntdef::FALSE;
 use winapi::shared::windef::{HWND};
 use winapi::um::commctrl::{LVM_GETITEMCOUNT, LVM_GETITEMRECT};
-use winapi::um::memoryapi::{ReadProcessMemory, VirtualAllocEx, WriteProcessMemory};
+use winapi::um::handleapi::CloseHandle;
+use winapi::um::memoryapi::{ReadProcessMemory, VirtualAllocEx, WriteProcessMemory, VirtualFreeEx};
 use winapi::um::processthreadsapi::OpenProcess;
 use winapi::um::shellapi::{SHQueryUserNotificationState, QUERY_USER_NOTIFICATION_STATE};
 use winapi::um::winnt::{
   MEM_COMMIT, PAGE_READWRITE, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ,
-  PROCESS_VM_WRITE,
+  PROCESS_VM_WRITE, MEM_RELEASE,
 };
 use winapi::um::winuser::{
   EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, GetWindowThreadProcessId,
@@ -354,7 +355,10 @@ pub fn get_sys_list_view_icon_rect() -> Vec<RECT> {
 
             i += 1;
           }
+          VirtualFreeEx(handle, prc, 0, MEM_RELEASE);
         }
+
+        CloseHandle(handle);
       }
     }
   }
