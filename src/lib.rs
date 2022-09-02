@@ -171,4 +171,14 @@ mod exports_not_windows {
   pub fn get_sys_taskbar_state() -> TaskbarState {
     TaskbarState::new()
   }
+
+  #[napi]
+  pub fn set_system_cursor_style() {
+    set_system_cursor_style_win()
+  }
+
+  #[napi]
+  pub fn restore_system_cursor_style() {
+    restore_system_cursor_style_win()
+  }
 }
