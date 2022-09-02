@@ -35,6 +35,12 @@ export const enum ACCENT {
   AccentEnableFluent = 4,
   AccentNormal = 150
 }
+export interface Color {
+  r: number
+  g: number
+  b: number
+  a: number
+}
 export function setWindowWorker(hWnd: number): void
 export function restoreWindowWorker(): void
 export function showDesktopIcon(): void
@@ -44,7 +50,7 @@ export function hideShellWindow(): void
 export function showPeekWindow(): void
 export function hidePeekWindow(): void
 export function queryUserState(): number
-export function setTaskbarStyle(accept: ACCENT, color: number): boolean
+export function setTaskbarStyle(accept: ACCENT, color: Color): boolean
 export function restoreTaskbarStyle(): boolean
 export function getSysListViewIconRect(): Array<Rect>
 export function getSysTaskbarState(): TaskbarState

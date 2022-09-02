@@ -174,11 +174,11 @@ mod exports_not_windows {
 
   #[napi]
   pub fn set_system_cursor_style() {
-    set_system_cursor_style_win()
+    todo!()
   }
 
   #[napi]
   pub fn restore_system_cursor_style() {
-    restore_system_cursor_style_win()
+    todo!()
   }
 }
