@@ -6,7 +6,9 @@ mod windows;
 #[cfg(windows)]
 #[allow(unused)]
 mod exports_windows {
-  use crate::common::{Color, TaskbarState, ACCENT, RECT};
+  use crate::common::{
+    Color, CursorResourceCollection, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT,
+  };
 
   use super::windows::{
     get_sys_list_view_icon_rect as get_sys_list_view_icon_rect_win,
@@ -89,8 +91,25 @@ mod exports_windows {
   }
 
   #[napi]
-  pub fn set_system_cursor_style() {
-    set_system_cursor_style_win()
+  pub fn set_system_cursor_style(resource: CursorResourceCollection) {
+    let internal_resource = InternalCursorResourceCollection {
+      app_starting: Some(resource.app_starting),
+      normal: Some(resource.normal),
+      hand: Some(resource.hand),
+      cross: Some(resource.cross),
+      wait: Some(resource.wait),
+      i_beam: Some(resource.i_beam),
+      no: Some(resource.no),
+      size: Some(resource.size),
+      size_all: Some(resource.size_all),
+      size_nesw: Some(resource.size_nesw),
+      size_ns: Some(resource.size_ns),
+      size_nwse: Some(resource.size_nwse),
+      size_we: Some(resource.size_we),
+      up_arrow: Some(resource.up_arrow),
+    };
+
+    set_system_cursor_style_win(internal_resource)
   }
 
   #[napi]
@@ -108,7 +127,7 @@ mod exports_macos {}
 #[cfg(not(windows))]
 #[allow(unused)]
 mod exports_not_windows {
-  use crate::common::{TaskbarState, ACCENT, Color};
+  use crate::common::{Color, TaskbarState, ACCENT};
   use napi_derive::napi;
 
   #[napi]

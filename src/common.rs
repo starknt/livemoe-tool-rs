@@ -93,3 +93,41 @@ impl Color {
     self.a << 24 | self.r << 16 | self.g << 8 | self.b << 0
   }
 }
+
+#[napi(object)]
+#[derive(Debug)]
+pub struct CursorResourceCollection {
+  pub app_starting: String,
+  pub normal: String,
+  pub hand: String,
+  pub cross: String,
+  pub wait: String,
+  pub i_beam: String,
+  pub no: String,
+  pub size: String,
+  pub size_all: String,
+  pub size_nesw: String,
+  pub size_ns: String,
+  pub size_nwse: String,
+  pub size_we: String,
+  pub up_arrow: String,
+}
+
+
+pub struct InternalCursorResourceCollection {
+  pub app_starting: Option<String>,
+  pub normal: Option<String>,
+  pub hand: Option<String>,
+  pub cross: Option<String>,
+  pub wait: Option<String>,
+  pub i_beam: Option<String>,
+  pub no: Option<String>,
+  pub size: Option<String>,
+  pub size_all: Option<String>,
+  pub size_nesw: Option<String>,
+  pub size_ns: Option<String>,
+  pub size_nwse: Option<String>,
+  pub size_we: Option<String>,
+  pub up_arrow: Option<String>,
+}
+

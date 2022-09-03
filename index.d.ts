@@ -41,6 +41,22 @@ export interface Color {
   b: number
   a: number
 }
+export interface CursorResourceCollection {
+  appStarting: string
+  normal: string
+  hand: string
+  cross: string
+  wait: string
+  iBeam: string
+  no: string
+  size: string
+  sizeAll: string
+  sizeNesw: string
+  sizeNs: string
+  sizeNwse: string
+  sizeWe: string
+  upArrow: string
+}
 export function setWindowWorker(hWnd: number): void
 export function restoreWindowWorker(): void
 export function showDesktopIcon(): void
@@ -54,5 +70,5 @@ export function setTaskbarStyle(accept: ACCENT, color: Color): boolean
 export function restoreTaskbarStyle(): boolean
 export function getSysListViewIconRect(): Array<Rect>
 export function getSysTaskbarState(): TaskbarState
-export function setSystemCursorStyle(): void
+export function setSystemCursorStyle(resource: CursorResourceCollection): void
 export function restoreSystemCursorStyle(): void

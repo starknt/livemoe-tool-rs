@@ -5,9 +5,12 @@ mod windef;
 use self::user32::{ACCENTPOLICY, WINDOWCOMPOSITIONATTRIBDATA};
 use self::windef::SyncHWND;
 use super::TEXT;
-use crate::common::{Alignment, TaskbarState, ACCENT, RECT};
+use crate::common::{
+  Alignment, CursorResourceCollection, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT,
+};
 use crate::windows::user32::get_set_window_composition_attribute_func;
 use std::isize;
+use std::path::Path;
 use std::ptr::null_mut;
 use winapi::shared::basetsd::PDWORD_PTR;
 use winapi::shared::minwindef::{DWORD, LPARAM};
@@ -442,21 +445,48 @@ impl Into<u32> for SystemCursorId {
   }
 }
 
-pub fn set_system_cursor_style() {
+fn internal_set_cursor_style(path: Option<String>, style_id: SystemCursorId) {
+  let op_path: Option<String> = if let Some(path) = path {
+    if !Path::new(&path).exists() {
+      return ();
+    }
+
+    Some(path)
+  } else {
+    None
+  };
+
   unsafe {
-    SystemParametersInfoW(SPI_SETCURSORS, 0, null_mut(), SPIF_SENDWININICHANGE);
+    let op_h_icon = if let Some(path) = op_path {
+      Some(LoadCursorFromFileW(TEXT!(&path)))
+    } else {
+      None
+    };
 
-    let app_starting = LoadCursorFromFileW(TEXT!("E:\\Project\\JavaScript\\Electron\\lm-client\\assets\\LiveMoeCursorResource\\BLUE ALIEN\\AppStarting.ani"));
-    let arrow = LoadCursorFromFileW(TEXT!("E:\\Project\\JavaScript\\Electron\\lm-client\\assets\\LiveMoeCursorResource\\BLUE ALIEN\\Arrow.ani"));
-    SetSystemCursor(app_starting, SystemCursorId::AppStarting.into());
-    SetSystemCursor(arrow, SystemCursorId::Normal.into());
+    if let Some(h_icon) = op_h_icon {
+      SetSystemCursor(h_icon, style_id.into());
+    }
+  }
+}
 
-    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
-    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
-    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
-    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
-    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
-    // SetSystemCursor(null_mut(), SystemCursorId::AppStarting.into());
+pub fn set_system_cursor_style(resource: InternalCursorResourceCollection) {
+  unsafe {
+    restore_system_cursor_style();
+
+    internal_set_cursor_style(resource.app_starting, SystemCursorId::AppStarting);
+    internal_set_cursor_style(resource.normal, SystemCursorId::Normal);
+    internal_set_cursor_style(resource.cross, SystemCursorId::Cross);
+    internal_set_cursor_style(resource.hand, SystemCursorId::Hand);
+    internal_set_cursor_style(resource.i_beam, SystemCursorId::IBeam);
+    internal_set_cursor_style(resource.no, SystemCursorId::No);
+    internal_set_cursor_style(resource.size, SystemCursorId::Size);
+    internal_set_cursor_style(resource.size_all, SystemCursorId::SizeAll);
+    internal_set_cursor_style(resource.size_nesw, SystemCursorId::SizeNESW);
+    internal_set_cursor_style(resource.size_ns, SystemCursorId::SizeNS);
+    internal_set_cursor_style(resource.size_nwse, SystemCursorId::SizeNWSE);
+    internal_set_cursor_style(resource.size_we, SystemCursorId::SizeWE);
+    internal_set_cursor_style(resource.up_arrow, SystemCursorId::Up);
+    internal_set_cursor_style(resource.wait, SystemCursorId::Wait);
   }
 }
 
@@ -508,6 +538,6 @@ mod test {
 
   #[test]
   fn test_set_system_cursor_style() {
-    set_system_cursor_style();
+    // set_system_cursor_style();
   }
 }
