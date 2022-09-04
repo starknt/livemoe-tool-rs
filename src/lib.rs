@@ -14,7 +14,7 @@ mod exports_windows {
     get_sys_list_view_icon_rect as get_sys_list_view_icon_rect_win,
     get_sys_taskbar_state as get_sys_taskbar_state_win, hide_desktop_icon as hide_desktop_icon_win,
     hide_peek_window as hide_peek_window_win, hide_shell_window as hide_shell_window_win,
-    query_user_state as query_user_state_win,
+    is_in_desktop_window as is_in_desktop_window_win, query_user_state as query_user_state_win,
     restore_system_cursor_style as restore_system_cursor_style_win,
     restore_taskbar_style as restore_taskbar_style_win,
     restore_window_worker as restore_window_worker_win,
@@ -117,6 +117,11 @@ mod exports_windows {
   pub fn restore_system_cursor_style() {
     restore_system_cursor_style_win()
   }
+
+  #[napi]
+  pub fn is_in_desktop_window() -> bool {
+    is_in_desktop_window_win()
+  }
 }
 
 #[cfg(linux)]
@@ -200,5 +205,10 @@ mod exports_not_windows {
   #[napi]
   pub fn restore_system_cursor_style() {
     todo!()
+  }
+
+  #[napi]
+  pub fn is_in_desktop_window() -> bool {
+    false
   }
 }

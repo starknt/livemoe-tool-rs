@@ -11,7 +11,7 @@ use std::isize;
 use std::path::Path;
 use std::ptr::null_mut;
 use winapi::shared::basetsd::PDWORD_PTR;
-use winapi::shared::minwindef::{DWORD, LPARAM, BOOL, TRUE, FALSE};
+use winapi::shared::minwindef::{BOOL, DWORD, FALSE, LPARAM, TRUE};
 use winapi::shared::windef::{HWND, RECT as WIN_RECT};
 use winapi::um::commctrl::{LVM_GETITEMCOUNT, LVM_GETITEMRECT};
 use winapi::um::handleapi::CloseHandle;
@@ -26,9 +26,10 @@ use winapi::um::winnt::{
   PROCESS_VM_READ, PROCESS_VM_WRITE,
 };
 use winapi::um::winuser::{
-  EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, GetWindowThreadProcessId,
-  LoadCursorFromFileW, SendMessageTimeoutW, SendMessageW, SetParent, SetSystemCursor, ShowWindow,
-  SystemParametersInfoW, SMTO_NORMAL, SPIF_SENDWININICHANGE, SPI_SETCURSORS, SW_HIDE, SW_SHOW,
+  EnumWindows, FindWindowExW, FindWindowW, GetForegroundWindow, GetShellWindow,
+  GetWindowThreadProcessId, LoadCursorFromFileW, SendMessageTimeoutW, SendMessageW, SetParent,
+  SetSystemCursor, ShowWindow, SystemParametersInfoW, SMTO_NORMAL, SPIF_SENDWININICHANGE,
+  SPI_SETCURSORS, SW_HIDE, SW_SHOW,
 };
 
 static mut WORKER_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
@@ -77,7 +78,12 @@ unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> BOOL {
       TEXT!("SysListView32"),
       TEXT!("FolderView"),
     ));
-    WORKER_WINDOW_HANDLER.change(FindWindowExW(null_mut(), h_wnd, TEXT!("WorkerW"), TEXT!("")));
+    WORKER_WINDOW_HANDLER.change(FindWindowExW(
+      null_mut(),
+      h_wnd,
+      TEXT!("WorkerW"),
+      TEXT!(""),
+    ));
     return FALSE;
   }
 
@@ -302,7 +308,7 @@ pub fn query_user_state() -> u32 {
 
 pub fn get_sys_list_view_icon_rect() -> Vec<RECT> {
   let fold_view = find_sys_folder_view_window();
-  let mut rects: Vec<RECT> = vec![];
+  let mut icon_collection: Vec<RECT> = vec![];
 
   if !fold_view.is_null() {
     unsafe {
@@ -352,7 +358,7 @@ pub fn get_sys_list_view_icon_rect() -> Vec<RECT> {
             );
 
             if r > 0 {
-              rects.push(rect);
+              icon_collection.push(rect);
             }
 
             i += 1;
@@ -365,7 +371,7 @@ pub fn get_sys_list_view_icon_rect() -> Vec<RECT> {
     }
   }
 
-  rects
+  icon_collection
 }
 
 pub fn get_sys_taskbar_state() -> TaskbarState {
@@ -467,6 +473,18 @@ pub fn restore_system_cursor_style() {
   }
 }
 
+pub fn is_in_desktop_window() -> bool {
+  unsafe {
+    if WORKER_WINDOW_HANDLER.is_null() && __WORKER_WINDOW_HANDLER.is_null() {
+      create_worker_window();
+      find_worker_window();
+    }
+
+    GetForegroundWindow() == WORKER_WINDOW_HANDLER.hwnd()
+      || GetForegroundWindow() == __WORKER_WINDOW_HANDLER.hwnd()
+  }
+}
+
 #[cfg(test)]
 mod test {
 
@@ -515,5 +533,13 @@ mod test {
   #[test]
   fn test_restore_system_cursor_style() {
     restore_system_cursor_style();
+  }
+
+  #[test]
+  fn test_is_in_desktop_window() {
+    loop {
+      println!("{}", is_in_desktop_window());
+      std::thread::sleep(std::time::Duration::from_millis(1000));
+    }
   }
 }
