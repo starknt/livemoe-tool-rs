@@ -43,7 +43,7 @@ export interface Color {
 }
 export interface CursorResourceCollection {
   appStarting: string
-  normal: string
+  arrow: string
   hand: string
   cross: string
   wait: string
@@ -56,6 +56,7 @@ export interface CursorResourceCollection {
   sizeNwse: string
   sizeWe: string
   upArrow: string
+  help: string
 }
 export function setWindowWorker(hWnd: number): void
 export function restoreWindowWorker(): void

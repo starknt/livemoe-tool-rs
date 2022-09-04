@@ -6,7 +6,7 @@ use self::user32::{ACCENTPOLICY, WINDOWCOMPOSITIONATTRIBDATA};
 use self::windef::SyncHWND;
 use super::TEXT;
 use crate::common::{
-  Alignment, CursorResourceCollection, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT,
+  Alignment, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT,
 };
 use crate::windows::user32::get_set_window_composition_attribute_func;
 use std::isize;
@@ -424,7 +424,7 @@ pub fn get_sys_taskbar_state() -> TaskbarState {
 
 enum SystemCursorId {
   AppStarting = 32650,
-  Normal = 32512,
+  Arrow = 32512,
   Hand = 32649,
   Cross = 32515,
   IBeam = 32513,
@@ -437,6 +437,7 @@ enum SystemCursorId {
   SizeWE = 32644,
   Up = 32516,
   Wait = 32514,
+  Help = 32651,
 }
 
 impl Into<u32> for SystemCursorId {
@@ -470,24 +471,23 @@ fn internal_set_cursor_style(path: Option<String>, style_id: SystemCursorId) {
 }
 
 pub fn set_system_cursor_style(resource: InternalCursorResourceCollection) {
-  unsafe {
-    restore_system_cursor_style();
+  restore_system_cursor_style();
 
-    internal_set_cursor_style(resource.app_starting, SystemCursorId::AppStarting);
-    internal_set_cursor_style(resource.normal, SystemCursorId::Normal);
-    internal_set_cursor_style(resource.cross, SystemCursorId::Cross);
-    internal_set_cursor_style(resource.hand, SystemCursorId::Hand);
-    internal_set_cursor_style(resource.i_beam, SystemCursorId::IBeam);
-    internal_set_cursor_style(resource.no, SystemCursorId::No);
-    internal_set_cursor_style(resource.size, SystemCursorId::Size);
-    internal_set_cursor_style(resource.size_all, SystemCursorId::SizeAll);
-    internal_set_cursor_style(resource.size_nesw, SystemCursorId::SizeNESW);
-    internal_set_cursor_style(resource.size_ns, SystemCursorId::SizeNS);
-    internal_set_cursor_style(resource.size_nwse, SystemCursorId::SizeNWSE);
-    internal_set_cursor_style(resource.size_we, SystemCursorId::SizeWE);
-    internal_set_cursor_style(resource.up_arrow, SystemCursorId::Up);
-    internal_set_cursor_style(resource.wait, SystemCursorId::Wait);
-  }
+  internal_set_cursor_style(resource.app_starting, SystemCursorId::AppStarting);
+  internal_set_cursor_style(resource.arrow, SystemCursorId::Arrow);
+  internal_set_cursor_style(resource.cross, SystemCursorId::Cross);
+  internal_set_cursor_style(resource.hand, SystemCursorId::Hand);
+  internal_set_cursor_style(resource.i_beam, SystemCursorId::IBeam);
+  internal_set_cursor_style(resource.no, SystemCursorId::No);
+  internal_set_cursor_style(resource.size, SystemCursorId::Size);
+  internal_set_cursor_style(resource.size_all, SystemCursorId::SizeAll);
+  internal_set_cursor_style(resource.size_nesw, SystemCursorId::SizeNESW);
+  internal_set_cursor_style(resource.size_ns, SystemCursorId::SizeNS);
+  internal_set_cursor_style(resource.size_nwse, SystemCursorId::SizeNWSE);
+  internal_set_cursor_style(resource.size_we, SystemCursorId::SizeWE);
+  internal_set_cursor_style(resource.up_arrow, SystemCursorId::Up);
+  internal_set_cursor_style(resource.wait, SystemCursorId::Wait);
+  internal_set_cursor_style(resource.help, SystemCursorId::Help);
 }
 
 pub fn restore_system_cursor_style() {
@@ -539,5 +539,10 @@ mod test {
   #[test]
   fn test_set_system_cursor_style() {
     // set_system_cursor_style();
+  }
+
+  #[test]
+  fn test_restore_system_cursor_style() {
+    restore_system_cursor_style();
   }
 }

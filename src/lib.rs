@@ -94,7 +94,7 @@ mod exports_windows {
   pub fn set_system_cursor_style(resource: CursorResourceCollection) {
     let internal_resource = InternalCursorResourceCollection {
       app_starting: Some(resource.app_starting),
-      normal: Some(resource.normal),
+      arrow: Some(resource.arrow),
       hand: Some(resource.hand),
       cross: Some(resource.cross),
       wait: Some(resource.wait),
@@ -107,6 +107,7 @@ mod exports_windows {
       size_nwse: Some(resource.size_nwse),
       size_we: Some(resource.size_we),
       up_arrow: Some(resource.up_arrow),
+      help: Some(resource.help),
     };
 
     set_system_cursor_style_win(internal_resource)
