@@ -11,8 +11,7 @@ use std::isize;
 use std::path::Path;
 use std::ptr::null_mut;
 use winapi::shared::basetsd::PDWORD_PTR;
-use winapi::shared::minwindef::{DWORD, LPARAM};
-use winapi::shared::ntdef::FALSE;
+use winapi::shared::minwindef::{DWORD, LPARAM, BOOL, TRUE, FALSE};
 use winapi::shared::windef::{HWND, RECT as WIN_RECT};
 use winapi::um::commctrl::{LVM_GETITEMCOUNT, LVM_GETITEMRECT};
 use winapi::um::handleapi::CloseHandle;
@@ -66,7 +65,7 @@ fn create_worker_window() {
   }
 }
 
-unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> i32 {
+unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> BOOL {
   let def_view = FindWindowExW(h_wnd, null_mut(), TEXT!("SHELLDLL_DefView"), TEXT!(""));
 
   if !def_view.is_null() {
@@ -79,10 +78,10 @@ unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> i32 {
       TEXT!("FolderView"),
     ));
     WORKER_WINDOW_HANDLER.change(FindWindowExW(null_mut(), h_wnd, TEXT!("WorkerW"), TEXT!("")));
-    return 0;
+    return FALSE;
   }
 
-  1
+  TRUE
 }
 
 fn find_worker_window() -> HWND {
