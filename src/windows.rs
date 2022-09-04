@@ -32,10 +32,10 @@ use winapi::um::winuser::{
   SystemParametersInfoW, SMTO_NORMAL, SPIF_SENDWININICHANGE, SPI_SETCURSORS, SW_HIDE, SW_SHOW,
 };
 
-static mut WORKERW: SyncHWND = SyncHWND(null_mut());
-static mut DEF_VIEW: SyncHWND = SyncHWND(null_mut());
-static mut __WORKERW: SyncHWND = SyncHWND(null_mut());
-static mut FOLD_VIEW: SyncHWND = SyncHWND(null_mut());
+static mut WORKER_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
+static mut DEF_VIEW_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
+static mut __WORKER_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
+static mut FOLD_VIEW_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
 
 fn find_progman_window() -> HWND {
   unsafe { FindWindowW(TEXT!("Progman"), TEXT!("Program Manager")) }
@@ -70,15 +70,15 @@ unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> i32 {
   let def_view = FindWindowExW(h_wnd, null_mut(), TEXT!("SHELLDLL_DefView"), TEXT!(""));
 
   if !def_view.is_null() {
-    DEF_VIEW.change(def_view);
-    __WORKERW.change(h_wnd);
-    FOLD_VIEW.change(FindWindowExW(
-      DEF_VIEW.hwnd(),
+    DEF_VIEW_WINDOW_HANDLER.change(def_view);
+    __WORKER_WINDOW_HANDLER.change(h_wnd);
+    FOLD_VIEW_WINDOW_HANDLER.change(FindWindowExW(
+      DEF_VIEW_WINDOW_HANDLER.hwnd(),
       null_mut(),
       TEXT!("SysListView32"),
       TEXT!("FolderView"),
     ));
-    WORKERW.change(FindWindowExW(null_mut(), h_wnd, TEXT!("WorkerW"), TEXT!("")));
+    WORKER_WINDOW_HANDLER.change(FindWindowExW(null_mut(), h_wnd, TEXT!("WorkerW"), TEXT!("")));
     return 0;
   }
 
@@ -87,11 +87,11 @@ unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> i32 {
 
 fn find_worker_window() -> HWND {
   unsafe {
-    if WORKERW.is_null() {
+    if WORKER_WINDOW_HANDLER.is_null() {
       EnumWindows(Some(enum_windows_proc), 0 as isize);
     }
 
-    WORKERW.hwnd()
+    WORKER_WINDOW_HANDLER.hwnd()
   }
 }
 
@@ -150,50 +150,50 @@ fn find_sys_folder_view_window() -> HWND {
 
 pub fn set_window_worker(h_wnd: *const usize) {
   unsafe {
-    if WORKERW.is_null() {
+    if WORKER_WINDOW_HANDLER.is_null() {
       create_worker_window();
       find_worker_window();
 
-      if WORKERW.is_null() {
-        WORKERW.change(find_progman_window());
+      if WORKER_WINDOW_HANDLER.is_null() {
+        WORKER_WINDOW_HANDLER.change(find_progman_window());
       }
     }
 
-    SetParent(h_wnd as HWND, WORKERW.0);
-    ShowWindow(WORKERW.hwnd(), SW_SHOW);
+    SetParent(h_wnd as HWND, WORKER_WINDOW_HANDLER.0);
+    ShowWindow(WORKER_WINDOW_HANDLER.hwnd(), SW_SHOW);
   }
 }
 
 pub fn restore_window_worker() {
   unsafe {
-    if WORKERW.is_null() {
+    if WORKER_WINDOW_HANDLER.is_null() {
       find_worker_window();
     }
 
-    ShowWindow(WORKERW.hwnd(), SW_HIDE);
+    ShowWindow(WORKER_WINDOW_HANDLER.hwnd(), SW_HIDE);
   }
 }
 
 pub fn show_desktop_icon() {
   unsafe {
-    if FOLD_VIEW.is_null() {
-      FOLD_VIEW.change(find_sys_folder_view_window());
+    if FOLD_VIEW_WINDOW_HANDLER.is_null() {
+      FOLD_VIEW_WINDOW_HANDLER.change(find_sys_folder_view_window());
     }
 
-    if !FOLD_VIEW.is_null() {
-      ShowWindow(FOLD_VIEW.hwnd(), SW_SHOW);
+    if !FOLD_VIEW_WINDOW_HANDLER.is_null() {
+      ShowWindow(FOLD_VIEW_WINDOW_HANDLER.hwnd(), SW_SHOW);
     }
   }
 }
 
 pub fn hide_desktop_icon() {
   unsafe {
-    if FOLD_VIEW.is_null() {
-      FOLD_VIEW.change(find_sys_folder_view_window());
+    if FOLD_VIEW_WINDOW_HANDLER.is_null() {
+      FOLD_VIEW_WINDOW_HANDLER.change(find_sys_folder_view_window());
     }
 
-    if !FOLD_VIEW.is_null() {
-      ShowWindow(FOLD_VIEW.hwnd(), SW_HIDE);
+    if !FOLD_VIEW_WINDOW_HANDLER.is_null() {
+      ShowWindow(FOLD_VIEW_WINDOW_HANDLER.hwnd(), SW_HIDE);
     }
   }
 }
