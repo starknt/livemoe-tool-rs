@@ -34,7 +34,7 @@ use winapi::um::winuser::{
 static mut WORKER_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
 static mut DEF_VIEW_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
 static mut __WORKER_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
-static mut FOLD_VIEW_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
+static mut FOLDER_VIEW_WINDOW_HANDLER: SyncHWND = SyncHWND(null_mut());
 
 fn find_progman_window() -> HWND {
   unsafe { FindWindowW(TEXT!("Progman"), TEXT!("Program Manager")) }
@@ -71,7 +71,7 @@ unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> BOOL {
   if !def_view.is_null() {
     DEF_VIEW_WINDOW_HANDLER.change(def_view);
     __WORKER_WINDOW_HANDLER.change(h_wnd);
-    FOLD_VIEW_WINDOW_HANDLER.change(FindWindowExW(
+    FOLDER_VIEW_WINDOW_HANDLER.change(FindWindowExW(
       DEF_VIEW_WINDOW_HANDLER.hwnd(),
       null_mut(),
       TEXT!("SysListView32"),
@@ -175,24 +175,24 @@ pub fn restore_window_worker() {
 
 pub fn show_desktop_icon() {
   unsafe {
-    if FOLD_VIEW_WINDOW_HANDLER.is_null() {
-      FOLD_VIEW_WINDOW_HANDLER.change(find_sys_folder_view_window());
+    if FOLDER_VIEW_WINDOW_HANDLER.is_null() {
+      FOLDER_VIEW_WINDOW_HANDLER.change(find_sys_folder_view_window());
     }
 
-    if !FOLD_VIEW_WINDOW_HANDLER.is_null() {
-      ShowWindow(FOLD_VIEW_WINDOW_HANDLER.hwnd(), SW_SHOW);
+    if !FOLDER_VIEW_WINDOW_HANDLER.is_null() {
+      ShowWindow(FOLDER_VIEW_WINDOW_HANDLER.hwnd(), SW_SHOW);
     }
   }
 }
 
 pub fn hide_desktop_icon() {
   unsafe {
-    if FOLD_VIEW_WINDOW_HANDLER.is_null() {
-      FOLD_VIEW_WINDOW_HANDLER.change(find_sys_folder_view_window());
+    if FOLDER_VIEW_WINDOW_HANDLER.is_null() {
+      FOLDER_VIEW_WINDOW_HANDLER.change(find_sys_folder_view_window());
     }
 
-    if !FOLD_VIEW_WINDOW_HANDLER.is_null() {
-      ShowWindow(FOLD_VIEW_WINDOW_HANDLER.hwnd(), SW_HIDE);
+    if !FOLDER_VIEW_WINDOW_HANDLER.is_null() {
+      ShowWindow(FOLDER_VIEW_WINDOW_HANDLER.hwnd(), SW_HIDE);
     }
   }
 }
