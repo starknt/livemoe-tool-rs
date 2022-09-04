@@ -3,11 +3,9 @@ mod user32;
 mod windef;
 
 use self::user32::{ACCENTPOLICY, WINDOWCOMPOSITIONATTRIBDATA};
-use self::windef::SyncHWND;
+use self::windef::{SyncHWND, SystemCursorId};
 use super::TEXT;
-use crate::common::{
-  Alignment, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT,
-};
+use crate::common::{Alignment, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT};
 use crate::windows::user32::get_set_window_composition_attribute_func;
 use std::isize;
 use std::path::Path;
@@ -72,15 +70,15 @@ unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> i32 {
   let def_view = FindWindowExW(h_wnd, null_mut(), TEXT!("SHELLDLL_DefView"), TEXT!(""));
 
   if !def_view.is_null() {
-    DEF_VIEW.0 = def_view;
-    __WORKERW.0 = h_wnd;
-    FOLD_VIEW.0 = FindWindowExW(
-      DEF_VIEW.0,
+    DEF_VIEW.change(def_view);
+    __WORKERW.change(h_wnd);
+    FOLD_VIEW.change(FindWindowExW(
+      DEF_VIEW.hwnd(),
       null_mut(),
       TEXT!("SysListView32"),
       TEXT!("FolderView"),
-    );
-    WORKERW.0 = FindWindowExW(null_mut(), h_wnd, TEXT!("WorkerW"), TEXT!(""));
+    ));
+    WORKERW.change(FindWindowExW(null_mut(), h_wnd, TEXT!("WorkerW"), TEXT!("")));
     return 0;
   }
 
@@ -89,11 +87,11 @@ unsafe extern "system" fn enum_windows_proc(h_wnd: HWND, _: isize) -> i32 {
 
 fn find_worker_window() -> HWND {
   unsafe {
-    if WORKERW.0.is_null() {
+    if WORKERW.is_null() {
       EnumWindows(Some(enum_windows_proc), 0 as isize);
     }
 
-    WORKERW.0
+    WORKERW.hwnd()
   }
 }
 
@@ -152,52 +150,50 @@ fn find_sys_folder_view_window() -> HWND {
 
 pub fn set_window_worker(h_wnd: *const usize) {
   unsafe {
-    if WORKERW.0.is_null() {
+    if WORKERW.is_null() {
       create_worker_window();
       find_worker_window();
 
-      if WORKERW.0.is_null() {
-        WORKERW.0 = find_progman_window();
+      if WORKERW.is_null() {
+        WORKERW.change(find_progman_window());
       }
     }
 
     SetParent(h_wnd as HWND, WORKERW.0);
-    ShowWindow(WORKERW.0, SW_SHOW);
+    ShowWindow(WORKERW.hwnd(), SW_SHOW);
   }
 }
 
 pub fn restore_window_worker() {
   unsafe {
-    if WORKERW.0.is_null() {
+    if WORKERW.is_null() {
       find_worker_window();
     }
 
-    ShowWindow(WORKERW.0, SW_HIDE);
+    ShowWindow(WORKERW.hwnd(), SW_HIDE);
   }
 }
 
 pub fn show_desktop_icon() {
   unsafe {
-    if FOLD_VIEW.0.is_null() {
-      FOLD_VIEW.0 = find_sys_folder_view_window();
+    if FOLD_VIEW.is_null() {
+      FOLD_VIEW.change(find_sys_folder_view_window());
     }
 
-    if !FOLD_VIEW.0.is_null() {
-      ShowWindow(FOLD_VIEW.0, SW_SHOW);
+    if !FOLD_VIEW.is_null() {
+      ShowWindow(FOLD_VIEW.hwnd(), SW_SHOW);
     }
   }
 }
 
 pub fn hide_desktop_icon() {
   unsafe {
-    if FOLD_VIEW.0.is_null() {
-      FOLD_VIEW.0 = find_sys_folder_view_window();
+    if FOLD_VIEW.is_null() {
+      FOLD_VIEW.change(find_sys_folder_view_window());
     }
 
-    println!("{:p}", find_progman_window());
-
-    if !FOLD_VIEW.0.is_null() {
-      ShowWindow(FOLD_VIEW.0, SW_HIDE);
+    if !FOLD_VIEW.is_null() {
+      ShowWindow(FOLD_VIEW.hwnd(), SW_HIDE);
     }
   }
 }
@@ -419,30 +415,6 @@ pub fn get_sys_taskbar_state() -> TaskbarState {
     };
 
     state
-  }
-}
-
-enum SystemCursorId {
-  AppStarting = 32650,
-  Arrow = 32512,
-  Hand = 32649,
-  Cross = 32515,
-  IBeam = 32513,
-  No = 32648,
-  Size = 32640,
-  SizeAll = 32646,
-  SizeNESW = 32643,
-  SizeNS = 32645,
-  SizeNWSE = 32642,
-  SizeWE = 32644,
-  Up = 32516,
-  Wait = 32514,
-  Help = 32651,
-}
-
-impl Into<u32> for SystemCursorId {
-  fn into(self) -> u32 {
-    self as u32
   }
 }
 
