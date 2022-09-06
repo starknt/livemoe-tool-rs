@@ -1,7 +1,7 @@
 {
   "name": "@livemoe/tools",
   "packageManager": "pnpm@7.6.0",
-  "version": "0.2.1",
+  "version": "0.2.2-beta.0",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
