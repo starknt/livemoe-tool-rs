@@ -238,6 +238,7 @@ jobs:
           options: '-v ${{ github.workspace }}:/build -w /build'
           run: |
             set -e
+            pnpm install --no-frozen-lockfile
             pnpm test
             ls -la
   test-linux-arm-gnueabihf-binding:
@@ -279,6 +280,7 @@ jobs:
           options: '-v ${{ github.workspace }}:/build -w /build'
           run: |
             set -e
+            pnpm install --no-frozen-lockfile
             pnpm test
             ls -la
   publish:
