@@ -1,5 +1,5 @@
 {
-  "name": "@livemoe/toolswin32-ia32-msvc",
+  "name": "@livemoe/tools-win32-ia32-msvc",
   "packageManager": "pnpm@7.6.0",
   "version": "0.2.2",
   "os": [
