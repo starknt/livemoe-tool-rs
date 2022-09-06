@@ -1,0 +1,19 @@
+{
+  "name": "@livemoe/tools-linux-arm-gnueabihf",
+  "packageManager": "pnpm@7.6.0",
+  "version": "0.2.0",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm"
+  ],
+  "main": "tools.linux-arm-gnueabihf.node",
+  "files": [
+    "tools.linux-arm-gnueabihf.node"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  }
+}

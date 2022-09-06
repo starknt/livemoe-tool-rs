@@ -1,0 +1,19 @@
+{
+  "name": "@livemoe/tools-darwin-arm64",
+  "packageManager": "pnpm@7.6.0",
+  "version": "0.2.0",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "main": "tools.darwin-arm64.node",
+  "files": [
+    "tools.darwin-arm64.node"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  }
+}

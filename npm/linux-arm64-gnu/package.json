@@ -1,0 +1,22 @@
+{
+  "name": "@livemoe/tools-linux-arm64-gnu",
+  "packageManager": "pnpm@7.6.0",
+  "version": "0.2.0",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "main": "tools.linux-arm64-gnu.node",
+  "files": [
+    "tools.linux-arm64-gnu.node"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  },
+  "libc": [
+    "glibc"
+  ]
+}
