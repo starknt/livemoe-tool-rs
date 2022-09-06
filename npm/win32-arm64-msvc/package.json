@@ -1,7 +1,7 @@
 {
   "name": "@livemoe/tools-win32-arm64-msvc",
   "packageManager": "pnpm@7.6.0",
-  "version": "0.2.2-beta.0",
+  "version": "0.2.2",
   "os": [
     "win32"
   ],

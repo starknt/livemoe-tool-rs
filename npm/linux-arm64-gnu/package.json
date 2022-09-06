@@ -1,7 +1,7 @@
 {
   "name": "@livemoe/tools-linux-arm64-gnu",
   "packageManager": "pnpm@7.6.0",
-  "version": "0.2.2-beta.0",
+  "version": "0.2.2",
   "os": [
     "linux"
   ],
