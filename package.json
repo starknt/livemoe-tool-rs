@@ -38,8 +38,12 @@
     "release": "bumpp package.json npm/*/package.json --commit --push --tag"
   },
   "optionalDependencies": {
-    "@livemoe/tools-win32-x64-msvc": "0.0.0",
-    "@livemoe/tools-darwin-x64": "0.0.0",
-    "@livemoe/tools-linux-x64-gnu": "0.0.0"
+    "@livemoe/tools-win32-x64-msvc": "*",
+    "@livemoe/tools-win32-arm64-msvc": "*",
+    "@livemoe/tools-darwin-x64": "*",
+    "@livemoe/tools-darwin-arm64": "*",
+    "@livemoe/tools-linux-x64-gnu": "*",
+    "@livemoe/tools-linux-arm-gnueabihf": "*",
+    "@livemoe/tools-linux-arm64-gnu": "*"
   }
 }
