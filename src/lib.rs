@@ -27,7 +27,7 @@ mod exports_windows {
 
   #[napi]
   pub fn set_window_worker(h_wnd: u32) {
-    set_window_worker_win(h_wnd as *const usize);
+    set_window_worker_win(h_wnd as isize);
   }
 
   #[napi]
@@ -67,7 +67,7 @@ mod exports_windows {
 
   #[napi]
   pub fn query_user_state() -> u32 {
-    query_user_state_win()
+    query_user_state_win() as u32
   }
 
   #[napi]

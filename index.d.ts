@@ -73,3 +73,4 @@ export function getSysListViewIconRect(): Array<Rect>
 export function getSysTaskbarState(): TaskbarState
 export function setSystemCursorStyle(resource: CursorResourceCollection): void
 export function restoreSystemCursorStyle(): void
+export function isInDesktopWindow(): boolean
