@@ -6,7 +6,6 @@ use self::internal::*;
 use crate::common::{Alignment, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT};
 use std::isize;
 use windows::Win32::Foundation::{CloseHandle, BOOL, HWND, LPARAM, RECT as WIN_RECT, WPARAM};
-use windows::Win32::Graphics::Dwm::{DwmEnableBlurBehindWindow, DWM_BLURBEHIND};
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
 use windows::Win32::System::Memory::{
   VirtualAllocEx, VirtualFreeEx, MEM_COMMIT, MEM_RELEASE, PAGE_READWRITE,
@@ -118,18 +117,6 @@ pub fn set_taskbar_style(accept: ACCENT, color: u32) -> bool {
 
   if taskbar.0 == 0 {
     return false;
-  }
-
-  unsafe {
-    if let Ok(()) = DwmEnableBlurBehindWindow(
-      taskbar,
-      &DWM_BLURBEHIND {
-        fEnable: true.into(),
-        hRgnBlur: windows::Win32::Graphics::Gdi::HRGN(3),
-        dwFlags: windows::Win32::Graphics::Dwm::DWM_BB_ENABLE,
-        fTransitionOnMaximized: true.into(),
-      },
-    ) {}
   }
 
   set_taskbar_window_blur(taskbar, accept, color)
@@ -340,6 +327,10 @@ mod test {
   #[test]
   fn test_set_taskbar_style() {
     set_taskbar_style(ACCENT::AccentEnableBlurbehind, 0x041eff04);
+
+    std::thread::sleep(std::time::Duration::from_millis(1000 * 10));
+
+    restore_taskbar_style();
   }
 
   #[test]

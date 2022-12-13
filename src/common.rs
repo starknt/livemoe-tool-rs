@@ -52,6 +52,7 @@ impl TaskbarState {
 }
 
 #[napi]
+#[derive(PartialEq)]
 pub enum ACCENT {
   AccentEnableGradient = 1, // Use a solid coarrowcified by nColor. This mode ignores the alpha value and is fully opaque.
   AccentEnableTransparentgradient = 2, // Use a tinted transparent overlay. nColor is the tint color.

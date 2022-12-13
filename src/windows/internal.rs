@@ -5,6 +5,7 @@ use wchar::{wchar_t, wchz};
 
 use windows::core::PCWSTR;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, WPARAM};
+use windows::Win32::Graphics::Dwm::{DwmEnableBlurBehindWindow, DWM_BLURBEHIND, DwmGetColorizationColor};
 use windows::Win32::UI::WindowsAndMessaging::{
   EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, LoadCursorFromFileW,
   SendMessageTimeoutW, SetSystemCursor, SMTO_NORMAL, SYSTEM_CURSOR_ID,
@@ -27,6 +28,7 @@ pub static mut WORKER_WINDOW_HANDLER: HWND = HWND(0);
 pub static mut DEF_VIEW_WINDOW_HANDLER: HWND = HWND(0);
 pub static mut __WORKER_WINDOW_HANDLER: HWND = HWND(0);
 pub static mut FOLDER_VIEW_WINDOW_HANDLER: HWND = HWND(0);
+pub static mut TASK_BAR_COLOR: i64 = -1;
 
 pub enum SystemCursorId {
   AppStarting = 32650,
@@ -195,7 +197,7 @@ pub fn find_sys_folder_view_window() -> HWND {
   }
 }
 
-pub fn set_taskbar_window_blur(taskbar: HWND, accept: ACCENT, color: u32) -> bool {
+pub fn set_taskbar_window_blur(taskbar: HWND, accept: ACCENT, mut color: u32) -> bool {
   let set_window_composition_attribute: _ =
     if let Some(f) = get_set_window_composition_attribute_func() {
       f
@@ -204,6 +206,42 @@ pub fn set_taskbar_window_blur(taskbar: HWND, accept: ACCENT, color: u32) -> boo
     };
 
   unsafe {
+    if TASK_BAR_COLOR == -1 {
+      let mut _color: u32 = 0;
+      let mut blend: BOOL = false.into();
+      if let Ok(()) = DwmGetColorizationColor(&mut _color, &mut blend) {
+        TASK_BAR_COLOR = _color.into();
+      }
+    } else if ACCENT::AccentNormal == accept {
+      color = TASK_BAR_COLOR as u32;
+    }
+
+    match accept {
+      ACCENT::AccentEnableBlurbehind => {
+        if let Ok(()) = DwmEnableBlurBehindWindow(
+          taskbar,
+          &DWM_BLURBEHIND {
+            fEnable: true.into(),
+            hRgnBlur: windows::Win32::Graphics::Gdi::HRGN(3),
+            dwFlags: windows::Win32::Graphics::Dwm::DWM_BB_ENABLE,
+            fTransitionOnMaximized: true.into(),
+          },
+        ) {}
+      }
+      ACCENT::AccentNormal => {
+        if let Ok(()) = DwmEnableBlurBehindWindow(
+          taskbar,
+          &DWM_BLURBEHIND {
+            fEnable: false.into(),
+            hRgnBlur: windows::Win32::Graphics::Gdi::HRGN(3),
+            dwFlags: windows::Win32::Graphics::Dwm::DWM_BB_ENABLE,
+            fTransitionOnMaximized: true.into(),
+          },
+        ) {}
+      }
+      _ => {}
+    }
+
     let mut policy = ACCENTPOLICY {
       nAccentState: accept.into(),
       nFlags: 2,
