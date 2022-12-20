@@ -1,9 +1,9 @@
 use super::macros::get_function_impl;
 use crate::get_function;
 use lazy_static::lazy_static;
+use std::ffi::{c_ulong, c_void};
 use wchar::{wchar_t, wchz};
-use windows::Win32::Foundation::{HWND, BOOL};
-use std::ffi::{ c_void, c_ulong };
+use windows::Win32::Foundation::{BOOL, HWND};
 
 #[allow(non_snake_case)]
 pub type WINDOWCOMPOSITIONATTRIB = u32;

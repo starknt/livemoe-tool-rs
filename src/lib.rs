@@ -11,18 +11,24 @@ mod exports_windows {
   };
 
   use super::windows::{
+    acquire_shutdown_block as acquire_shutdown_block_win,
     get_sys_list_view_icon_rect as get_sys_list_view_icon_rect_win,
     get_sys_taskbar_state as get_sys_taskbar_state_win, hide_desktop_icon as hide_desktop_icon_win,
     hide_peek_window as hide_peek_window_win, hide_shell_window as hide_shell_window_win,
+    insert_wnd_proc_hook as insert_wnd_proc_hook_win,
     is_in_desktop_window as is_in_desktop_window_win, query_user_state as query_user_state_win,
+    release_shutdown_block as release_shutdown_block_win,
+    remove_wnd_proc_hook as remove_wnd_proc_hook_win,
     restore_system_cursor_style as restore_system_cursor_style_win,
     restore_taskbar_style as restore_taskbar_style_win,
     restore_window_worker as restore_window_worker_win,
+    set_main_window_handle as set_main_window_handle_win,
     set_system_cursor_style as set_system_cursor_style_win,
     set_taskbar_style as set_taskbar_style_win, set_window_worker as set_window_worker_win,
     show_desktop_icon as show_desktop_icon_win, show_peek_window as show_peek_window_win,
     show_shell_window as show_shell_window_win,
   };
+  use napi::{bindgen_prelude::BigInt, JsFunction};
   use napi_derive::napi;
 
   #[napi]
@@ -122,6 +128,31 @@ mod exports_windows {
   pub fn is_in_desktop_window() -> bool {
     is_in_desktop_window_win()
   }
+
+  #[napi]
+  pub fn set_main_window_handle(h_wnd: BigInt) -> bool {
+    set_main_window_handle_win(h_wnd.get_u64().1)
+  }
+
+  #[napi]
+  pub fn insert_wnd_proc_hook(callback: JsFunction) -> bool {
+    insert_wnd_proc_hook_win(callback)
+  }
+
+  #[napi]
+  pub fn remove_wnd_proc_hook() -> bool {
+    remove_wnd_proc_hook_win()
+  }
+
+  #[napi]
+  pub fn acquire_shutdown_block(reason: String) -> bool {
+    acquire_shutdown_block_win(&reason)
+  }
+
+  #[napi]
+  pub fn release_shutdown_block() -> bool {
+    release_shutdown_block_win()
+  }
 }
 
 #[cfg(linux)]
@@ -209,6 +240,31 @@ mod exports_not_windows {
 
   #[napi]
   pub fn is_in_desktop_window() -> bool {
+    false
+  }
+
+  #[napi]
+  pub fn set_main_window_handle(_: BigInt) -> bool {
+    false
+  }
+
+  #[napi]
+  pub fn insert_wnd_proc_hook(_: JsFunction) -> bool {
+    false
+  }
+
+  #[napi]
+  pub fn remove_wnd_proc_hook() -> bool {
+    false
+  }
+
+  #[napi]
+  pub fn acquire_shutdown_block(_: String) -> bool {
+    false
+  }
+
+  #[napi]
+  pub fn release_shutdown_block() -> bool {
     false
   }
 }

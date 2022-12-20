@@ -1,10 +1,13 @@
 mod internal;
 mod macros;
 mod user32;
+mod shutdown;
 
 use self::internal::*;
+use self::shutdown::*;
 use crate::common::{Alignment, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT};
 use std::isize;
+use napi::JsFunction;
 use windows::Win32::Foundation::{CloseHandle, BOOL, HWND, LPARAM, RECT as WIN_RECT, WPARAM};
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
 use windows::Win32::System::Memory::{
@@ -296,6 +299,51 @@ pub fn is_in_desktop_window() -> bool {
 
     GetForegroundWindow().eq(&WORKER_WINDOW_HANDLER)
       || GetForegroundWindow().eq(&__WORKER_WINDOW_HANDLER)
+  }
+}
+
+
+/**
+ * implement windows 'shutdown' event for electron
+ *
+ * ref: https://github.com/paymoapp/electron-shutdown-handler/blob/master/module/WinShutdownHandler.cpp
+ */
+
+pub fn set_main_window_handle(h_wnd: u64) -> bool {
+  unsafe {
+    _set_main_window_handle(HWND(h_wnd as _))
+  }
+
+  true
+}
+
+pub fn insert_wnd_proc_hook(callback: JsFunction) -> bool {
+  unsafe {
+    if let Ok(tsfn) = callback.create_threadsafe_function(0, |ctx| {
+      ctx.env.create_uint32(ctx.value + 1).map(|v| vec![v])
+    }) {
+      TSFN = Some(tsfn)
+    }
+
+    _insert_wnd_proc_hook()
+  }
+}
+
+pub fn remove_wnd_proc_hook() -> bool {
+  unsafe {
+    _remove_wnd_proc_hook()
+  }
+}
+
+pub fn acquire_shutdown_block(reason: &str) -> bool {
+  unsafe {
+    _acquire_shutdown_block(reason)
+  }
+}
+
+pub fn release_shutdown_block() -> bool {
+  unsafe {
+    _release_shutdown_block()
   }
 }
 

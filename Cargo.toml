@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 # Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
-napi = { version = "2.9.0", default-features = false, features = ["napi4"] }
+napi = { version = "2.9.0", default-features = false, features = ["napi4", "napi6"] }
 napi-derive = "2.9.0"
 lazy_static = "1.4.0"
 
@@ -25,7 +25,8 @@ features = [
     "Win32_System_Threading",
     "Win32_System_Diagnostics_Debug",
     "Win32_Graphics_Gdi",
-    "Win32_Graphics_Dwm"
+    "Win32_Graphics_Dwm",
+    "Win32_System_Shutdown"
 ]
 
 [target.'cfg(windows)'.dependencies]

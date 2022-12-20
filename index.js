@@ -236,7 +236,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { UserState, Alignment, ACCENT, setWindowWorker, restoreWindowWorker, showDesktopIcon, hideDesktopIcon, showShellWindow, hideShellWindow, showPeekWindow, hidePeekWindow, queryUserState, setTaskbarStyle, restoreTaskbarStyle, getSysListViewIconRect, getSysTaskbarState, setSystemCursorStyle, restoreSystemCursorStyle, isInDesktopWindow } = nativeBinding
+const { UserState, Alignment, ACCENT, setWindowWorker, restoreWindowWorker, showDesktopIcon, hideDesktopIcon, showShellWindow, hideShellWindow, showPeekWindow, hidePeekWindow, queryUserState, setTaskbarStyle, restoreTaskbarStyle, getSysListViewIconRect, getSysTaskbarState, setSystemCursorStyle, restoreSystemCursorStyle, isInDesktopWindow, setMainWindowHandle, insertWndProcHook, removeWndProcHook, acquireShutdownBlock, releaseShutdownBlock } = nativeBinding
 
 module.exports.UserState = UserState
 module.exports.Alignment = Alignment
@@ -257,3 +257,8 @@ module.exports.getSysTaskbarState = getSysTaskbarState
 module.exports.setSystemCursorStyle = setSystemCursorStyle
 module.exports.restoreSystemCursorStyle = restoreSystemCursorStyle
 module.exports.isInDesktopWindow = isInDesktopWindow
+module.exports.setMainWindowHandle = setMainWindowHandle
+module.exports.insertWndProcHook = insertWndProcHook
+module.exports.removeWndProcHook = removeWndProcHook
+module.exports.acquireShutdownBlock = acquireShutdownBlock
+module.exports.releaseShutdownBlock = releaseShutdownBlock

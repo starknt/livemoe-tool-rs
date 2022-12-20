@@ -5,7 +5,9 @@ use wchar::{wchar_t, wchz};
 
 use windows::core::PCWSTR;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, WPARAM};
-use windows::Win32::Graphics::Dwm::{DwmEnableBlurBehindWindow, DWM_BLURBEHIND, DwmGetColorizationColor};
+use windows::Win32::Graphics::Dwm::{
+  DwmEnableBlurBehindWindow, DwmGetColorizationColor, DWM_BLURBEHIND,
+};
 use windows::Win32::UI::WindowsAndMessaging::{
   EnumWindows, FindWindowExW, FindWindowW, GetShellWindow, LoadCursorFromFileW,
   SendMessageTimeoutW, SetSystemCursor, SMTO_NORMAL, SYSTEM_CURSOR_ID,

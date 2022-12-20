@@ -74,3 +74,8 @@ export function getSysTaskbarState(): TaskbarState
 export function setSystemCursorStyle(resource: CursorResourceCollection): void
 export function restoreSystemCursorStyle(): void
 export function isInDesktopWindow(): boolean
+export function setMainWindowHandle(hWnd: bigint): boolean
+export function insertWndProcHook(callback: (...args: any[]) => any): boolean
+export function removeWndProcHook(): boolean
+export function acquireShutdownBlock(reason: string): boolean
+export function releaseShutdownBlock(): boolean
