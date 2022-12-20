@@ -165,6 +165,7 @@ mod exports_macos {}
 #[allow(unused)]
 mod exports_not_windows {
   use crate::common::{Color, TaskbarState, ACCENT};
+  use napi::{bindgen_prelude::BigInt, JsFunction};
   use napi_derive::napi;
 
   #[napi]
@@ -182,7 +183,6 @@ mod exports_not_windows {
     todo!()
   }
 
-  #[cfg(not(windows))]
   #[napi]
   pub fn hide_desktop_icon() {
     todo!()
