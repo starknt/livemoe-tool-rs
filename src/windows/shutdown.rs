@@ -16,7 +16,7 @@ use windows::{
 pub static mut MAIN_WINDOW: HWND = HWND(0);
 pub static mut PREV_WND_PROC: WNDPROC = None;
 pub static mut SHOULD_BLOCK_SHUTDOWN: bool = false;
-pub static mut TSFN: Option<ThreadsafeFunction<u32>> = None;
+pub static mut FN: Option<ThreadsafeFunction<i64>> = None;
 
 /**
  * implement windows 'shutdown' event for electron
@@ -54,7 +54,7 @@ pub unsafe fn _remove_wnd_proc_hook() -> bool {
   }
 
   if let Some(proc) = PREV_WND_PROC {
-    TSFN = None;
+    FN = None;
     SetWindowLongPtrW(MAIN_WINDOW, GWLP_WNDPROC, proc as _);
   }
 
@@ -92,8 +92,8 @@ unsafe extern "system" fn window_proc(
   l_param: LPARAM,
 ) -> LRESULT {
   if event == WM_QUERYENDSESSION {
-    if let Some(jsfn) = &TSFN {
-      jsfn.call(Ok(1), ThreadsafeFunctionCallMode::Blocking);
+    if let Some(func) = &FN {
+      func.call(Ok(l_param.0 as _), ThreadsafeFunctionCallMode::Blocking);
     }
 
     if SHOULD_BLOCK_SHUTDOWN {

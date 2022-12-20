@@ -319,10 +319,10 @@ pub fn set_main_window_handle(h_wnd: u64) -> bool {
 
 pub fn insert_wnd_proc_hook(callback: JsFunction) -> bool {
   unsafe {
-    if let Ok(tsfn) = callback.create_threadsafe_function(0, |ctx| {
-      ctx.env.create_uint32(ctx.value + 1).map(|v| vec![v])
+    if let Ok(func) = callback.create_threadsafe_function(0, |ctx| {
+      ctx.env.create_int64(ctx.value + 1).map(|v| vec![v])
     }) {
-      TSFN = Some(tsfn)
+      FN = Some(func)
     }
 
     _insert_wnd_proc_hook()
