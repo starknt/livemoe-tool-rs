@@ -7,6 +7,7 @@ use self::internal::*;
 use self::shutdown::*;
 use crate::common::{Alignment, InternalCursorResourceCollection, TaskbarState, ACCENT, RECT};
 use std::isize;
+use napi::JsBigInt;
 use napi::JsFunction;
 use windows::Win32::Foundation::{CloseHandle, BOOL, HWND, LPARAM, RECT as WIN_RECT, WPARAM};
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
@@ -25,7 +26,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
   SystemParametersInfoW, SPIF_SENDWININICHANGE, SPI_SETCURSORS, SW_HIDE, SW_SHOW,
 };
 
-pub fn set_window_worker(h_wnd: isize) {
+pub fn set_window_worker(buf: JsBigInt) {
   unsafe {
     if WORKER_WINDOW_HANDLER.0 == 0 {
       create_worker_window();
@@ -36,8 +37,11 @@ pub fn set_window_worker(h_wnd: isize) {
       }
     }
 
-    SetParent(HWND(h_wnd), WORKER_WINDOW_HANDLER);
-    ShowWindow(WORKER_WINDOW_HANDLER, SW_SHOW);
+    if let Ok((h_wnd, _)) = buf.get_u64() {
+      SetParent(HWND(h_wnd as isize), WORKER_WINDOW_HANDLER);
+
+      ShowWindow(WORKER_WINDOW_HANDLER, SW_SHOW);
+    }
   }
 }
 
@@ -309,9 +313,11 @@ pub fn is_in_desktop_window() -> bool {
  * ref: https://github.com/paymoapp/electron-shutdown-handler/blob/master/module/WinShutdownHandler.cpp
  */
 
-pub fn set_main_window_handle(h_wnd: u64) -> bool {
+pub fn set_main_window_handle(h_wnd: JsBigInt) -> bool {
   unsafe {
-    _set_main_window_handle(HWND(h_wnd as _))
+    if let Ok((h_wnd, _)) = h_wnd.get_u64() {
+      _set_main_window_handle(HWND(h_wnd as isize))
+    }
   }
 
   true

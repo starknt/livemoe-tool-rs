@@ -28,12 +28,15 @@ mod exports_windows {
     show_desktop_icon as show_desktop_icon_win, show_peek_window as show_peek_window_win,
     show_shell_window as show_shell_window_win,
   };
-  use napi::{bindgen_prelude::BigInt, JsFunction};
+  use napi::{
+    bindgen_prelude::*,
+    JsFunction, JsBigInt,
+  };
   use napi_derive::napi;
 
   #[napi]
-  pub fn set_window_worker(h_wnd: u32) {
-    set_window_worker_win(h_wnd as isize);
+  pub fn set_window_worker(h_wnd: JsBigInt) {
+    set_window_worker_win(h_wnd);
   }
 
   #[napi]
@@ -130,8 +133,8 @@ mod exports_windows {
   }
 
   #[napi]
-  pub fn set_main_window_handle(h_wnd: BigInt) -> bool {
-    set_main_window_handle_win(h_wnd.get_u64().1)
+  pub fn set_main_window_handle(h_wnd: JsBigInt) -> bool {
+    set_main_window_handle_win(h_wnd)
   }
 
   #[napi]
@@ -165,11 +168,14 @@ mod exports_macos {}
 #[allow(unused)]
 mod exports_not_windows {
   use crate::common::{Color, TaskbarState, ACCENT};
-  use napi::{bindgen_prelude::BigInt, JsFunction};
+  use napi::{
+    bindgen_prelude::*,
+    JsFunction, JsBigInt,
+  };
   use napi_derive::napi;
 
   #[napi]
-  pub fn set_window_worker(h_wnd: u32) {
+  pub fn set_window_worker(h_wnd: JsBigInt) {
     todo!()
   }
 
@@ -244,7 +250,7 @@ mod exports_not_windows {
   }
 
   #[napi]
-  pub fn set_main_window_handle(_: BigInt) -> bool {
+  pub fn set_main_window_handle(_: JsBigInt) -> bool {
     false
   }
 

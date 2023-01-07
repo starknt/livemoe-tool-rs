@@ -58,7 +58,7 @@ export interface CursorResourceCollection {
   upArrow: string
   help: string
 }
-export function setWindowWorker(hWnd: number): void
+export function setWindowWorker(hWnd: bigint): void
 export function restoreWindowWorker(): void
 export function showDesktopIcon(): void
 export function hideDesktopIcon(): void
